@@ -12,12 +12,14 @@ preparat per lliurar en PDF és a [report/](report/).
 
 ```
 lib/
-  CentralEnergia.jar   libreria del enunciado (paquete IA.Energia), extraida de CentralEnergia.zip
+  CentralEnergia.jar   libreria del enunciado, extraida de CentralEnergia.zip
   AIMA.jar             libreria de la asignatura, extraida de AIMA.zip (dist/AIMA.jar)
-  lib/                 dependencias de AIMA.jar (jfreechart, itext, junit...), extraidas de
-                       AIMA.zip (dist/lib). Van en lib/lib porque el manifest de AIMA.jar
-                       declara "Class-Path: lib/..." relativo a su propia ubicacion, asi que
-                       desde ahi se resuelven solas y no hay que anadirlas al classpath.
+  lib/                 dependencias incluidas en AIMA.zip (dist/lib), como JFreeChart,
+                       iText y JUnit. No es una carpeta exclusiva de las demos:
+                       Graficas.java usa JFreeChart para generar las figuras del informe.
+                       Van en lib/lib porque el manifest de AIMA.jar declara
+                       "Class-Path: lib/..." relativo a la ubicacion de AIMA.jar.
+
 src/IA/PracticaEnergia/
   EstadoEnergia.java              representacion del estado, soluciones iniciales y operadores
   ConjuntoOperadores.java         conjuntos de operadores que se comparan
@@ -32,19 +34,46 @@ src/IA/PracticaEnergia/
   Comparaciones.java              contrastes binomiales por parejas sobre las replicas
   PruebaEstado.java               pruebas de la representacion y los operadores
   EscenarioInfactibleException.java
+
 docs/javadoc/          Javadoc de IA.Energia, inclòs amb el material de la pràctica
+
 docs/aima-src/         codi font d'AIMA, inclòs amb AIMA.src.zip, material de consulta
-resultados/            salida de los experimentos: csv, figuras png y texto
+
+results/               salida de los experimentos: csv, figuras png y texto
 ```
 
-## Procedència del material de suport
+## Procedència i organització del material
 
-`AIMA.src.zip`, `AIMA.zip` i `CentralEnergia.zip` són fitxers proporcionats
-amb l'enunciat o el material docent de la pràctica. `docs/aima-src/` és una
-còpia extreta de `AIMA.src.zip`, mentre que `docs/javadoc/` és la documentació
-HTML de l'API de `CentralEnergia.jar`, distribuïda amb aquest material. No són
-implementacions pròpies del grup; només s'han consultat per integrar
-correctament les interfícies de la pràctica.
+Els fitxers ZIP de la arrel són el material original proporcionat amb
+l'enunciat o amb el material docent. La relació entre l'origen i les còpies
+que s'utilitzen en el repositori és:
+
+| Element del repositori | Procedència | Funció |
+| --- | --- | --- |
+| `lib/AIMA.jar` | `AIMA.zip` (`dist/AIMA.jar`) | Llibreria AIMA que utilitza el codi propi |
+| `lib/lib/` | `AIMA.zip` (`dist/lib/`) | Dependències distribuïdes amb AIMA; JFreeChart és necessària per a `Graficas.java` |
+| `lib/CentralEnergia.jar` | `CentralEnergia.zip` | Llibreria del problema, amb el paquet `IA.Energia` |
+| `docs/aima-src/` | `AIMA.src.zip` | Codi font d'AIMA, conservat només com a material de consulta |
+| `docs/javadoc/` | `CentralEnergia.zip` | Javadoc de la llibreria `CentralEnergia.jar`, conservat com a documentació de consulta |
+
+Per tant, `src/` conté el codi desenvolupat per al grup, `lib/` conté les
+llibreries binàries necessàries per compilar-lo i executar-lo, i `docs/` conté
+còpies de consulta del material docent. Els ZIP originals es mantenen a la
+arrel per deixar traçable la procedència. No s'ha modificat el codi de `docs/`.
+
+### Per què existeix `lib/lib/`
+
+`lib/lib/` no s'ha de confondre amb una còpia innecessària ni amb una llibreria
+creada pel grup. És la carpeta `dist/lib/` que ja ve dins d'`AIMA.zip`. Conté,
+entre altres, els JAR de JFreeChart i JCommon que utilitza
+[`Graficas.java`](src/IA/PracticaEnergia/Graficas.java) per crear les figures
+de `results/`. També conté altres dependències que formen part de la
+distribució original d'AIMA.
+
+No es pot eliminar mantenint la funcionalitat actual. Només es podria treure
+si també s'eliminés `Graficas.java` o se substituís la generació de gràfics per
+una altra solució i es revisessin les dependències declarades al manifest
+de `AIMA.jar`.
 
 ## Requisits
 
@@ -70,7 +99,7 @@ java -cp "out;lib\CentralEnergia.jar;lib\AIMA.jar" IA.PracticaEnergia.MainExperi
 # experimentos: 1..6 (los del enunciado), 7 (heuristicas), 8 (HC frente a SA) o todos
 java -Xmx2g -cp "out;lib\CentralEnergia.jar;lib\AIMA.jar" IA.PracticaEnergia.MainExperimentos todos
 
-# figuras del informe y contrastes estadisticos (leen los csv de resultados/)
+# figuras del informe y contrastes estadisticos (leen los csv de results/)
 java -cp "out;lib\CentralEnergia.jar;lib\AIMA.jar" IA.PracticaEnergia.Graficas
 java -cp "out;lib\CentralEnergia.jar;lib\AIMA.jar" IA.PracticaEnergia.Comparaciones
 ```
@@ -84,7 +113,7 @@ quarto render report\report.qmd
 En Linux o macOS hay que cambiar los `;` del classpath por `:`.
 
 La bateria completa tarda unos dos minutos. Escribe un resumen por pantalla, el detalle de cada
-replica en `resultados/expN.csv` y las figuras en `resultados/fig*.png`.
+replica en `results/expN.csv` y las figuras en `results/fig*.png`.
 
 ## Notas
 

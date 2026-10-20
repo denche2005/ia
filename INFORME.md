@@ -9,9 +9,9 @@ Informe de la primera practica de Inteligencia Artificial (FIB-UPC).
 ## 0. Como leer este informe y como reproducirlo
 
 Todos los numeros salen de una unica ejecucion de la bateria completa, recogida en
-[resultados/salida_completa.txt](resultados/salida_completa.txt). El detalle replica a replica
-esta en `resultados/exp1.csv` .. `resultados/exp8.csv`, las figuras en `resultados/fig*.png` y
-los contrastes estadisticos en [resultados/comparaciones.txt](resultados/comparaciones.txt).
+[results/salida_completa.txt](results/salida_completa.txt). El detalle replica a replica
+esta en `results/exp1.csv` .. `results/exp8.csv`, las figuras en `results/fig*.png` y
+los contrastes estadisticos en [results/comparaciones.txt](results/comparaciones.txt).
 Las instrucciones para regenerarlo todo estan en el [README](README.md).
 
 Salvo que se diga lo contrario, el escenario es el del apartado 4.6.1 del enunciado: 5
@@ -409,7 +409,7 @@ progresiva entre conjuntos.
 | **MOVER_ASIGNAR_CENTRALES** | **1.358.883 (44.334)** | 14,5 | 10,8 | 36,3 |
 | COMPLETO | 1.358.883 (44.334) | 20,9 | 10,8 | 36,3 |
 
-![Beneficio segun el conjunto de operadores](resultados/fig1a-operadores.png)
+![Beneficio segun el conjunto de operadores](results/fig1a-operadores.png)
 
 **Resultado.** Mucho mas tajante que la hipotesis. Los tres primeros conjuntos dan **exactamente**
 el mismo valor, replica a replica, y se paran en **un solo paso**: son incapaces de mejorar la
@@ -432,7 +432,7 @@ que centrales estan encendidas. Se elige por tanto **MOVER_ASIGNAR_CENTRALES**.
 | 16 | 1.356.213 (45.801) | 15,2 | 10,6 |
 | 40 | 1.358.171 (46.144) | 43,7 | 11,5 |
 
-![Coste temporal segun el vecindario](resultados/fig1b-vecindario.png)
+![Coste temporal segun el vecindario](results/fig1b-vecindario.png)
 
 El tiempo crece de forma practicamente lineal con `k` (de 2,5 a 44 ms, 17 veces) mientras que el
 beneficio se mueve dentro de un margen del 0,6 %, muy por debajo de la desviacion tipica entre
@@ -453,9 +453,9 @@ TSP del enunciado.
 | ALEATORIA | 880.067 (66.066) | 1.282.558 (57.065) | 3,5 | 7,7 |
 | **VORAZ** | 1.207.656 (46.790) | **1.358.883 (44.334)** | 7,7 | 10,8 |
 
-![Beneficio final segun la solucion inicial](resultados/fig2a-inicial-beneficio.png)
+![Beneficio final segun la solucion inicial](results/fig2a-inicial-beneficio.png)
 
-![Aportacion de la busqueda a cada inicial](resultados/fig2b-inicial-mejora.png)
+![Aportacion de la busqueda a cada inicial](results/fig2b-inicial-mejora.png)
 
 **Resultado.** Lo contrario en las dos cosas. La voraz gana en calidad de forma clara (un 6,0 %
 mas de beneficio) y **gana en las 10 replicas** (p = 0,002). Y ademas necesita **mas** pasos, no
@@ -486,7 +486,7 @@ encontrando mejores soluciones a cambio de tiempo.
 | 25 | 1.353.170 | 1.356.149 | 1.356.613 |
 | 125 | 1.355.010 | 1.356.870 | 1.356.558 |
 
-![Beneficio segun k y lambda](resultados/fig3a-temperatura-beneficio.png)
+![Beneficio segun k y lambda](results/fig3a-temperatura-beneficio.png)
 
 **Resultado.** El beneficio es **practicamente insensible a los dos parametros**: las doce medias
 caben en un 0,35 %, frente a una desviacion entre replicas del 3,3 %. La figura esta dibujada con
@@ -502,7 +502,7 @@ de energia, es decir, a varios miles.
 
 Donde si hay un efecto enorme es en el **tiempo**, y por la razon descrita en el apartado 6:
 
-![Coste temporal segun k y lambda](resultados/fig3b-temperatura-tiempo.png)
+![Coste temporal segun k y lambda](results/fig3b-temperatura-tiempo.png)
 
 | lambda | Tiempo medio (ms) | Iteraciones realmente ejecutadas |
 |---|---|---|
@@ -521,7 +521,7 @@ Donde si hay un efecto enorme es en el **tiempo**, y por la razon descrita en el
 | 100.000 | 10 | 1.356.702 | 318,8 |
 | 100.000 | 1.000 | 1.355.257 | 307,2 |
 
-![Beneficio segun el numero de iteraciones](resultados/fig3c-iteraciones.png)
+![Beneficio segun el numero de iteraciones](results/fig3c-iteraciones.png)
 
 Pedir 250.000 iteraciones en vez de 100.000 no cambia ni el beneficio ni apenas el tiempo, y
 ahora sabemos exactamente por que: con `lambda = 0,01` la temperatura se anula en la iteracion
@@ -551,7 +551,7 @@ ramificacion es `clientes x k` con `k` fijo.
 | 1.000 | 1.358.883 | 10,1 | 10,8 | 0,67 |
 | 1.250 | INFACTIBLE | - | - | 0,93 |
 
-![Coste temporal al aumentar los clientes](resultados/fig4a-escalado-clientes.png)
+![Coste temporal al aumentar los clientes](results/fig4a-escalado-clientes.png)
 
 El tiempo crece de forma aproximadamente lineal, como se esperaba: la ramificacion y el coste de
 copiar un estado son lineales en el numero de clientes, y el numero de pasos hasta el optimo local
@@ -571,7 +571,7 @@ fallo del algoritmo sino una propiedad de los datos, y el programa lo detecta y 
 | 120 | 982.728 | 87,1 | 14,2 |
 | 160 | 714.225 | 122,9 | 18,2 |
 
-![Coste temporal al aumentar las centrales](resultados/fig4b-escalado-centrales.png)
+![Coste temporal al aumentar las centrales](results/fig4b-escalado-centrales.png)
 
 Aqui el tiempo crece **mas rapido que lineal** (x4 centrales, x11 tiempo), porque aumentan a la
 vez la ramificacion del operador de apertura y cierre, el coste de cada cierre y el numero de
@@ -603,7 +603,7 @@ restringir los operadores, porque permite perder tiempo en soluciones no validas
 | 1.000 | 1.359.661 | 10/10 | 1.330.885 | 10/10 |
 | 10.000 | 1.370.331 | 10/10 | 1.330.430 | 10/10 |
 
-![Soluciones validas segun la penalizacion](resultados/fig5-penalizacion.png)
+![Soluciones validas segun la penalizacion](results/fig5-penalizacion.png)
 
 **Resultado.** Dos sorpresas.
 
@@ -646,7 +646,7 @@ transporte y desplacen el uso de las centrales grandes, como sugiere el enunciad
 | SA | 50 | 1.278.027 (57.031) | 4,6 | 8,1 | 33,3 | 240,4 |
 | SA | 75 | 1.164.261 (70.841) | 4,2 | 7,9 | 38,7 | 250,9 |
 
-![Centrales encendidas por tipo](resultados/fig6-tipos-centrales.png)
+![Centrales encendidas por tipo](results/fig6-tipos-centrales.png)
 
 **Resultado.** El desplazamiento **existe pero es muy pequeno**, y el efecto global es claramente
 negativo. Con el triple de centrales C el uso de las de tipo A baja de 5,0 a 4,5 y el de las B de
@@ -674,7 +674,7 @@ dan gradiente o no.
 donde el beneficio a secas es ciego, y que un peso demasiado alto acabe siendo contraproducente
 porque deja de optimizarse el objetivo real.
 
-![Beneficio segun la funcion heuristica](resultados/fig7a-heuristicas.png)
+![Beneficio segun la funcion heuristica](results/fig7a-heuristicas.png)
 
 Con **operadores simples**, donde H1 se queda clavado en un solo paso:
 
@@ -692,7 +692,7 @@ Con **operadores compuestos**:
 | H2 perdidas (w=10) | 1.361.126 (46.389) | 700 | 19,6 | 5/10, p = 0,22 |
 | H3 cap. ociosa (w=10) | 1.359.856 (45.259) | 734 | 42,1 | 4/10, p = 0,69 |
 
-![Pasos que consigue dar el Hill Climbing](resultados/fig7d-heuristicas-pasos.png)
+![Pasos que consigue dar el Hill Climbing](results/fig7d-heuristicas-pasos.png)
 
 **Resultado.** La hipotesis se confirma, y de forma muy marcada.
 
@@ -716,9 +716,9 @@ mas pasos para el mismo resultado.
 
 **Efecto de la ponderacion:**
 
-![Efecto del peso con operadores simples](resultados/fig7b-pesos-simples.png)
+![Efecto del peso con operadores simples](results/fig7b-pesos-simples.png)
 
-![Efecto del peso con operadores compuestos](resultados/fig7c-pesos-compuestos.png)
+![Efecto del peso con operadores compuestos](results/fig7c-pesos-compuestos.png)
 
 Entre `w = 1` y `w = 50` los resultados son **identicos hasta el ultimo euro** con operadores
 simples (H2 da 1.214.193,41 para los tres pesos, con los mismos 9 pasos). No es casualidad: Hill
@@ -753,7 +753,7 @@ operadores.
 | **HC** | MOVER_ASIGNAR_CENTRALES | **1.358.883 (44.334)** | 151.227 (37.693) | **11,8** |
 | SA | MOVER_ASIGNAR_CENTRALES | 1.357.830 (45.743) | 150.174 (33.451) | 312,7 |
 
-![Hill Climbing frente a Simulated Annealing](resultados/fig8-hc-vs-sa.png)
+![Hill Climbing frente a Simulated Annealing](results/fig8-hc-vs-sa.png)
 
 La comparacion **depende por completo de los operadores, y en sentidos opuestos**.
 

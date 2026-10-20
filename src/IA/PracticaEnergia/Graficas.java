@@ -26,7 +26,9 @@ import org.jfree.data.statistics.DefaultBoxAndWhiskerCategoryDataset;
  * Genera las figuras del informe a partir de los CSV que deja {@link MainExperimentos}.
  *
  * Usa JFreeChart, que viene incluido en las dependencias del AIMA de la asignatura
- * (lib/lib/jfreechart-1.0.13.jar), asi que no hace falta ninguna herramienta externa.
+ * (lib/lib/jfreechart-1.0.13.jar), distribuido dentro de AIMA.zip. Por eso
+ * lib/lib no es exclusivo de las demos: esta clase lo necesita para generar
+ * las figuras del informe.
  *
  * Criterios de representacion, siguiendo el capitulo 7 del enunciado:
  * <ul>
@@ -45,7 +47,7 @@ import org.jfree.data.statistics.DefaultBoxAndWhiskerCategoryDataset;
  */
 public class Graficas {
 
-    private static final String DIR = "resultados";
+    private static final String DIR = "results";
     private static final int ANCHO = 780;
     private static final int ALTO = 480;
 

@@ -101,7 +101,7 @@ benefici un 5,9 % i guanya en les 10 rèpliques.
 Cada configuració es prova amb 10 rèpliques i les mateixes llavors. Per això
 les comparacions són emparellades i es pot aplicar el contrast binomial
 $B(10, 0,5)$. El detall complet, incloses totes les taules, es conserva a
-[`../INFORME.md`](../INFORME.md) i les dades originals a `../resultados/`.
+[`../INFORME.md`](../INFORME.md) i les dades originals a `../results/`.
 
 ### 4.1. Operadors i veïnatge
 
@@ -115,7 +115,7 @@ El veïnatge `k = 8` és un compromís adequat: ampliar-lo multiplica el temps
 però gairebé no canvia el benefici. La majoria de centrals llunyanes no
 apareixen en solucions bones.
 
-![Benefici segons el conjunt d'operadors.](../resultados/fig1a-operadores.png){width=88%}
+![Benefici segons el conjunt d'operadors.](../results/fig1a-operadores.png){width=88%}
 
 ### 4.2. Simulated Annealing
 
@@ -130,7 +130,7 @@ contra 1.207.656 €) perquè pot recórrer moviments laterals de la meseta.
 Amb els operadors compostos, els dos algorismes donen pràcticament el mateix
 benefici, però Hill Climbing és unes 27 vegades més ràpid.
 
-![Comparació entre Hill Climbing i Simulated Annealing.](../resultados/fig8-hc-vs-sa.png){width=88%}
+![Comparació entre Hill Climbing i Simulated Annealing.](../results/fig8-hc-vs-sa.png){width=88%}
 
 ### 4.3. Escalat i factibilitat
 

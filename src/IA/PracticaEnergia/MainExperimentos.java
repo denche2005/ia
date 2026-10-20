@@ -16,7 +16,7 @@ import java.io.PrintWriter;
  * <pre>
  *   java -Xmx2g -cp out;lib/* IA.PracticaEnergia.MainExperimentos [1|2|3|4|5|6|todos]
  * </pre>
- * Los resultados detallados se escriben ademas en resultados/expN.csv para poder hacer
+ * Los resultados detallados se escriben ademas en results/expN.csv para poder hacer
  * graficas con cualquier herramienta externa.
  */
 public class MainExperimentos {
@@ -54,7 +54,7 @@ public class MainExperimentos {
         java.util.Locale.setDefault(java.util.Locale.US);
 
         String que = args.length > 0 ? args[0].toLowerCase() : "todos";
-        new java.io.File("resultados").mkdirs();
+        new java.io.File("results").mkdirs();
 
         if (que.equals("smoke")) { smoke(); return; }
         if (que.equals("1") || que.equals("todos")) experimento1();
@@ -675,7 +675,7 @@ public class MainExperimentos {
     }
 
     private static void abreCsv(int numero, String cabeceraCsv) throws IOException {
-        csv = new PrintWriter(new FileWriter("resultados/exp" + numero + ".csv"));
+        csv = new PrintWriter(new FileWriter("results/exp" + numero + ".csv"));
         csv.println(cabeceraCsv);
     }
 

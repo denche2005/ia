@@ -32,7 +32,7 @@ import java.util.TreeMap;
  */
 public class Comparaciones {
 
-    private static final String DIR = "resultados";
+    private static final String DIR = "results";
 
     public static void main(String[] args) throws Exception {
         java.util.Locale.setDefault(java.util.Locale.US);
