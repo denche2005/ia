@@ -1,0 +1,16 @@
+# Compiled Java classes
+out/
+
+# Quarto and LaTeX auxiliary files
+report/*.aux
+report/*.log
+report/*.out
+report/*.toc
+report/report.tex
+report/*.fdb_latexmk
+report/*.fls
+report/*.synctex.gz
+
+# Operating-system/editor files
+.DS_Store
+Thumbs.db

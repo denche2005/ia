@@ -1,10 +1,12 @@
-# Practica de Busqueda Local - Distribucion de energia
+# Pràctica de cerca local: distribució d'energia
 
-Implementacion en Java de la primera practica de Inteligencia Artificial (FIB-UPC): asignacion
-de clientes a centrales electricas maximizando el beneficio, resuelta con los algoritmos Hill
-Climbing y Simulated Annealing de la libreria AIMA de la asignatura.
+Implementació en Java de la primera pràctica d'Intel·ligència Artificial
+(FIB-UPC): assignació de clients a centrals elèctriques maximitzant el benefici,
+resolta amb Hill Climbing i Simulated Annealing sobre la llibreria AIMA de
+l'assignatura.
 
-El analisis de los resultados esta en [INFORME.md](INFORME.md).
+L'anàlisi detallada dels resultats és a [INFORME.md](INFORME.md). El resum
+preparat per lliurar en PDF és a [report/](report/).
 
 ## Estructura
 
@@ -30,12 +32,21 @@ src/IA/PracticaEnergia/
   Comparaciones.java              contrastes binomiales por parejas sobre las replicas
   PruebaEstado.java               pruebas de la representacion y los operadores
   EscenarioInfactibleException.java
-docs/javadoc/          documentacion de IA.Energia (extraida de CentralEnergia.zip)
-docs/aima-src/         codigo fuente de AIMA (extraido de AIMA.src.zip), material de consulta
+docs/javadoc/          Javadoc de IA.Energia, inclòs amb el material de la pràctica
+docs/aima-src/         codi font d'AIMA, inclòs amb AIMA.src.zip, material de consulta
 resultados/            salida de los experimentos: csv, figuras png y texto
 ```
 
-## Requisitos
+## Procedència del material de suport
+
+`AIMA.src.zip`, `AIMA.zip` i `CentralEnergia.zip` són fitxers proporcionats
+amb l'enunciat o el material docent de la pràctica. `docs/aima-src/` és una
+còpia extreta de `AIMA.src.zip`, mentre que `docs/javadoc/` és la documentació
+HTML de l'API de `CentralEnergia.jar`, distribuïda amb aquest material. No són
+implementacions pròpies del grup; només s'han consultat per integrar
+correctament les interfícies de la pràctica.
+
+## Requisits
 
 `CentralEnergia.jar` esta compilado con la version 26 del formato de class
 (`Created-By: 26.0.2`), asi que **hace falta un JDK 26 o superior**. Con un JDK anterior el
@@ -64,6 +75,12 @@ java -cp "out;lib\CentralEnergia.jar;lib\AIMA.jar" IA.PracticaEnergia.Graficas
 java -cp "out;lib\CentralEnergia.jar;lib\AIMA.jar" IA.PracticaEnergia.Comparaciones
 ```
 
+Per generar el report en PDF:
+
+```powershell
+quarto render report\report.qmd
+```
+
 En Linux o macOS hay que cambiar los `;` del classpath por `:`.
 
 La bateria completa tarda unos dos minutos. Escribe un resumen por pantalla, el detalle de cada
@@ -81,7 +98,7 @@ estan fijadas, asi que los resultados de Hill Climbing se repiten exactamente. L
 Annealing no: `SimulatedAnnealingSearch` crea internamente un `java.util.Random` sin semilla. Por
 eso todas las conclusiones sobre el recocido se apoyan en medias sobre 10 replicas.
 
-**Avisos de compilacion.** Con `-Xlint:all` aparecen seis avisos, todos ajenos al codigo de la
-practica: cuatro `bad path element` por jars opcionales que declara el manifest de iText y que no
-vienen en `AIMA.zip`, y dos `rawtypes` por implementar `SuccessorFunction`, que en AIMA no usa
-genericos.
+**Avisos de compilació.** Amb `-Xlint:all` apareixen sis avisos, tots aliens
+al codi de la pràctica: quatre `bad path element` per jars opcionals que
+declara el manifest d'iText i que no venen a `AIMA.zip`, i dos `rawtypes` per
+implementar `SuccessorFunction`, que a AIMA no usa genèrics.

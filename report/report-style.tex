@@ -1,0 +1,21 @@
+\usepackage{microtype}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{xcolor}
+\usepackage{titlesec}
+\definecolor{projectblue}{HTML}{1F4E79}
+\definecolor{projectlight}{HTML}{EAF2F8}
+\definecolor{projectgray}{HTML}{5B6573}
+\titleformat{\chapter}[display]
+  {\normalfont\huge\bfseries\color{projectblue}}
+  {\chaptertitlename\ \thechapter}{12pt}{\Huge}
+\titleformat{\section}
+  {\normalfont\Large\bfseries\color{projectblue}}
+  {\thesection}{0.8em}{}
+\titleformat{\subsection}
+  {\normalfont\large\bfseries\color{projectblue}}
+  {\thesubsection}{0.8em}{}
+\setlist[itemize]{topsep=4pt,itemsep=2pt}
+\setlist[enumerate]{topsep=4pt,itemsep=2pt}
+\setlength{\parskip}{5pt}
+\setlength{\parindent}{0pt}
