@@ -48,6 +48,7 @@ public class GeneradorSucesoresSA implements SuccessorFunction {
     }
 
     @Override
+    @SuppressWarnings("rawtypes")
     public List getSuccessors(Object estado) {
         EstadoEnergia actual = (EstadoEnergia) estado;
         List<Successor> sucesores = new ArrayList<Successor>(1);

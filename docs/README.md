@@ -1,28 +1,22 @@
-# Material de suport i procedència
+# Material de consulta
 
-Aquesta carpeta conté material de consulta que no forma part del codi
-desenvolupat pel grup:
+Aquesta carpeta conté material docent i documentació de les biblioteques
+externes. No forma part del codi desenvolupat pel grup i no es modifica durant
+la implementació de la pràctica.
 
-- [`aima-src/`](aima-src/) és el codi font d'AIMA inclòs en el material de
-  l'assignatura (`AIMA.src.zip`). S'ha conservat per consultar el comportament
-  real de `HillClimbingSearch` i `SimulatedAnnealingSearch`.
-- [`javadoc/`](javadoc/) és la documentació HTML de l'API de
-  `CentralEnergia.jar`, inclosa a `CentralEnergia.zip`. Serveix per consultar
-  les classes del paquet `IA.Energia` sense disposar del seu codi font.
+## Contingut
 
-No s'han modificat aquests fitxers. El codi propi de la pràctica es troba a
-[`../src/`](../src/).
+- [`aima-src/`](aima-src/): codi font d'AIMA inclòs en `AIMA.src.zip`. Es
+  conserva per consultar el comportament intern de
+  `HillClimbingSearch` i `SimulatedAnnealingSearch`, així com exemples i
+  demostracions docents.
+- [`javadoc/`](javadoc/): documentació HTML de l'API de
+  `CentralEnergia.jar`, inclosa en `CentralEnergia.zip`. Permet consultar les
+  classes del paquet `IA.Energia` sense disposar del seu codi font.
 
-Les llibreries binàries corresponents es troben a [`../lib/`](../lib/):
+La documentació de `IA.Energia` inclou, entre d'altres, les classes
+`Central`, `Centrales`, `Cliente`, `Clientes` i `VEnergia`.
 
-- `../lib/AIMA.jar` prové de `AIMA.zip` (`dist/AIMA.jar`).
-- `../lib/lib/` prové de `AIMA.zip` (`dist/lib/`) i conté les dependències
-  distribuïdes amb AIMA. No és una carpeta exclusiva de les demos: els JAR de
-  JFreeChart que hi ha dins són necessaris per a `src/IA/PracticaEnergia/Graficas.java`,
-  que genera les figures dels experiments.
-
-No s'ha d'eliminar `../lib/lib/` mentre es mantingui la generació actual de
-gràfics. A més, `AIMA.jar` declara aquestes dependències al seu manifest amb
-rutes relatives `lib/...`, que és el motiu de conservar aquesta carpeta dins
-de `lib/`.
-- `../lib/CentralEnergia.jar` prové de `CentralEnergia.zip`.
+El codi propi de la pràctica es troba a
+[`../src/`](../src/), i les biblioteques binàries utilitzades per compilar-lo
+i executar-lo es troben a [`../lib/`](../lib/).

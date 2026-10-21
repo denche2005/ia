@@ -88,7 +88,7 @@ sus librerias.
 ## Compilar y ejecutar (Windows PowerShell)
 
 ```powershell
-javac -cp "lib\CentralEnergia.jar;lib\AIMA.jar" -d out (Get-ChildItem -Recurse src -Filter *.java | % FullName)
+javac -Xlint:all,-path -cp "lib\CentralEnergia.jar;lib\AIMA.jar" -d out (Get-ChildItem -Recurse src -Filter *.java | % FullName)
 
 # pruebas de la representacion del estado y los operadores
 java -cp "out;lib\CentralEnergia.jar;lib\AIMA.jar" IA.PracticaEnergia.PruebaEstado
@@ -127,7 +127,10 @@ estan fijadas, asi que los resultados de Hill Climbing se repiten exactamente. L
 Annealing no: `SimulatedAnnealingSearch` crea internamente un `java.util.Random` sin semilla. Por
 eso todas las conclusiones sobre el recocido se apoyan en medias sobre 10 replicas.
 
-**Avisos de compilació.** Amb `-Xlint:all` apareixen sis avisos, tots aliens
-al codi de la pràctica: quatre `bad path element` per jars opcionals que
-declara el manifest d'iText i que no venen a `AIMA.zip`, i dos `rawtypes` per
-implementar `SuccessorFunction`, que a AIMA no usa genèrics.
+**Avisos de compilación.** La API `SuccessorFunction` de AIMA utiliza `List`
+sin genéricos; los dos métodos adaptadores del proyecto lo indican
+explícitamente con `@SuppressWarnings("rawtypes")`. El manifiesto de la versión
+distribuida de AIMA referencia cuatro JAR opcionales de iText/Bouncy Castle que
+no se incluyen en `AIMA.zip`; por eso el comando de compilación usa
+`-Xlint:all,-path` para no mostrar esos avisos externos. Las dependencias
+necesarias para compilar y generar las gráficas sí están incluidas en `lib/lib/`.

@@ -1,6 +1,8 @@
+package IA.PracticaEnergia;
+
 import IA.Energia.*;
 
-public class Prova {
+public class Prueba0 {
     public static void main(String[] args) throws Exception {
         int seed = 1234;
         Centrales cs = new Centrales(new int[]{5, 10, 25}, seed);
@@ -50,4 +52,3 @@ public class Prova {
         System.out.println("Demanda garantits (sense pèrdues): " + demGar);
     }
 }
-

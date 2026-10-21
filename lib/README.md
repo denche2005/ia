@@ -1,41 +1,39 @@
 # Llibreries
 
-Aquesta carpeta conté les llibreries binàries necessàries per compilar i
+Aquesta carpeta conté les biblioteques binàries necessàries per compilar i
 executar el codi propi de la pràctica.
 
-## Procedència
+## Contingut
 
-- `AIMA.jar` és la llibreria AIMA distribuïda dins de `AIMA.zip`,
-  concretament `dist/AIMA.jar`.
-- `CentralEnergia.jar` és la llibreria del problema, distribuïda dins de
-  `CentralEnergia.zip`. Conté el paquet `IA.Energia`.
-- `lib/` és una còpia de `dist/lib/`, també inclosa dins d'`AIMA.zip`.
-  Conté les dependències que acompanya la distribució d'AIMA, com JFreeChart,
-  JCommon, iText i JUnit.
+- `CentralEnergia.jar`: biblioteca del problema energètic, proporcionada amb
+  l'enunciat. Conté el paquet `IA.Energia`, amb les classes `Central`,
+  `Centrales`, `Cliente`, `Clientes` i `VEnergia`.
+- `AIMA.jar`: biblioteca AIMA proporcionada per l'assignatura. Conté la
+  infraestructura i els algoritmes de cerca que utilitza el projecte.
+- `lib/`: dependències distribuïdes amb AIMA, com JFreeChart, JCommon, iText i
+  JUnit.
 
-## Per què existeix `lib/lib/`
+La carpeta interior `lib/` prové de `dist/lib/`, inclosa en `AIMA.zip`. No és
+una còpia creada pel grup ni una carpeta exclusiva de les demostracions
+d'AIMA: `Graficas.java` utilitza JFreeChart per generar les figures dels
+experiments.
 
-`AIMA.jar` declara al seu manifest les dependències amb rutes relatives
-`lib/...`. Per això la carpeta `lib/` interior es conserva dins d'aquesta
-carpeta i no s'ha de moure ni eliminar.
+## Procedència i ubicació
 
-A més, el codi propi utilitza directament JFreeChart a
-[`../src/IA/PracticaEnergia/Graficas.java`](../src/IA/PracticaEnergia/Graficas.java)
-per generar les figures dels experiments. Per tant, `lib/lib/` no és només
-material de les demos d'AIMA: és necessari per a la funcionalitat actual del
-projecte.
+- `AIMA.jar` i `lib/` provenen de `AIMA.zip`.
+- `CentralEnergia.jar` prové de `CentralEnergia.zip`.
 
-## Ús
+No s'ha de moure ni eliminar `lib/`: el manifest d'AIMA declara algunes
+dependències amb rutes relatives `lib/...`, i la generació de gràfiques depèn
+de JFreeChart i JCommon.
 
-Des de l'arrel del repositori, el classpath de Windows utilitzat per compilar
-i executar és:
+Des de l'arrel del repositori, les biblioteques principals s'afegeixen al
+*classpath* amb:
 
 ```powershell
-javac -cp "lib\CentralEnergia.jar;lib\AIMA.jar" -d out (Get-ChildItem -Recurse src -Filter *.java | % FullName)
-java -cp "out;lib\CentralEnergia.jar;lib\AIMA.jar" IA.PracticaEnergia.Graficas
+javac -cp "lib\CentralEnergia.jar;lib\AIMA.jar" ...
+java -cp "out;lib\CentralEnergia.jar;lib\AIMA.jar" ...
 ```
 
-El manifest d'AIMA resol les dependències de `lib/lib/` mitjançant aquestes
-rutes relatives. Els fitxers ZIP originals (`AIMA.zip` i
-`CentralEnergia.zip`) es troben a l'arrel del repositori per conservar la
-traçabilitat de la procedència.
+La documentació del paquet `IA.Energia` es troba a
+[`../docs/javadoc/`](../docs/javadoc/).
