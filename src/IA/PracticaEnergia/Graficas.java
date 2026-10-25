@@ -93,7 +93,8 @@ public class Graficas {
         // filtra para no dibujar puntos sueltos de los demas conjuntos.
         List<Map<String, String>> barridoK =
                 filtra(filas, "operadores", "MOVER_ASIGNAR_CENTRALES");
-        guarda(lineas(medias(barridoK, "vecindario", "operadores", "tiempoMs"),
+        guarda(lineas(ordenarCategoriasNumericas(
+                        medias(barridoK, "vecindario", "operadores", "tiempoMs")),
                       "Experimento 1: coste temporal segun el tamano del vecindario",
                       "vecindario k (centrales candidatas por cliente)", "tiempo medio (ms)", true),
                "fig1b-vecindario.png");
@@ -457,6 +458,26 @@ public class Graficas {
     }
 
     /** Medias de {@code valor} con {@code x} en el eje de categorias y {@code serie} como leyenda. */
+    /** Ordena las categorías del eje X como enteros (p. ej. k = 2, 4, 8, 16, 40). */
+    private static DefaultCategoryDataset ordenarCategoriasNumericas(DefaultCategoryDataset src) {
+        java.util.TreeSet<Integer> orden = new java.util.TreeSet<>();
+        for (int i = 0; i < src.getColumnCount(); i++) {
+            orden.add(Integer.parseInt(src.getColumnKey(i).toString()));
+        }
+        DefaultCategoryDataset out = new DefaultCategoryDataset();
+        for (int r = 0; r < src.getRowCount(); r++) {
+            Comparable<?> fila = src.getRowKey(r);
+            for (int k : orden) {
+                String col = String.valueOf(k);
+                Number v = src.getValue(fila, col);
+                if (v != null) {
+                    out.addValue(v, fila, col);
+                }
+            }
+        }
+        return out;
+    }
+
     private static DefaultCategoryDataset medias(List<Map<String, String>> filas, String x,
                                                  String serie, String valor) {
         Map<String, Map<String, List<Double>>> acum = new LinkedHashMap<>();

@@ -1,11 +1,12 @@
 ---
-title: "Pràctica de cerca local"
-subtitle: "Distribució d'energia elèctrica"
-author: "Denys · Albert · Bernat"
+title: "Práctica de búsqueda local"
+subtitle: "Distribución de energía eléctrica"
+author: "Denys Cherednychenko · Albert Piñol Boncompte · Biel Bernat Cuscó Collelldemont"
 date: 2026-10-20
-lang: ca
+lang: es
 format:
   pdf:
+    output-file: "Practica-energia-informe.pdf"
     documentclass: scrreprt
     papersize: a4
     geometry:
@@ -29,107 +30,109 @@ execute:
   error: false
 ---
 
-## Introducció
+## Introducción
 
-Informe de la primera practica de l'assignatura Inteligencia Artificial (GCED-UPC).
+Este informe documenta la primera práctica de la asignatura Inteligencia Artificial (GCED-UPC): resolver la asignación de clientes a centrales eléctricas mediante **búsqueda local** con **Hill Climbing** y **Simulated Annealing** sobre la infraestructura de **AIMA**. El objetivo es maximizar el beneficio net respetando capacidad, contratos garantizados y pérdidas de transporte. La conclusión central del trabajo es que el rendimiento depende menos del algoritmo elegido que del **diseño del vecindario** —en particular, operadores compuestos que encienden o apagan centrales— y de una **inicialización voraz** de calidad, porque el beneficio presenta **mesetas** cuando solo se reasignan clientes entre centrales ya activas.
 
-## Organització de l'equip
+## Organización del equipo
 
-- **Integrants:** Denys, Albert i Bernat.
-- **Mecanismes de comunicació:**
-- **Calendari de reunions i acords presos en cadascuna:**
-- **Com s'han resolt les discrepàncies:**
+- **Integrantes:** Denys Cherednychenko, Albert Piñol Boncompte y Biel Bernat Cuscó Collelldemont.
+- **Mecanismos de comunicación:** canal de Discord del grupo para consultas rápidas, enlaces al repositorio y avisos; reuniones síncronas para decisiones de diseño y reparto de tareas.
+- **Calendario de reuniones y acuerdos:** reuniones de **1 hora cada miércoles** desde el **16/9/2025**; en ellas se revisó el guión semanal, se fijaron prioridades de implementación (estado, operadores, experimentos) y criterios para las figuras del informe.
+- **Resolución de discrepancias:** consenso en reunión; si persistía la duda, se probaba la alternativa con una ejecución corta (`smoke` o un subconjunto de réplicas) y se adoptaba la opción con mejor beneficio o menor coste computacional.
 
-### Seguiment del guió i repartiment de tasques
+### Seguimiento del guión y reparto de tareas
 
-| Setmana | Objectius del guió | Responsable | Estat |
+| Semana | Objetivos del guión | Responsable principal | Estado |
 |---|---|---|---|
-| 1 | Entendre AIMA, executar els exemples, llegir l'enunciat | | |
-| 2 | Dissenyar la representació de l'estat i la seva interfície | | |
-| 3 | Implementar estat, solució inicial i operadors | | |
-| 4 | Generadors de successius, estat final, heurístiques | | |
-| 5 | Planificar, executar i analitzar els experiments | | |
-| 6 | Documentació final | | |
+| 1 | Entender AIMA, ejecutar ejemplos, leer el enunciado | Los tres | Completado |
+| 2 | Diseñar la representación del estado y su interfaz | Denys, Albert | Completado |
+| 3 | Implementar estado, solución inicial y operadores | Denys, Albert | Completado |
+| 4 | Generadores de sucesores, estado final, heurísticas | Denys, Albert | Completado |
+| 5 | Planificar, ejecutar y analizar experimentos | Denys, Albert; Biel (figuras y revisiones) | Completado |
+| 6 | Documentación e informe final | Los tres (redacción conjunta) | Completado |
 
-## Estructura del projecte {.unnumbered}
+Denys y Albert concentraron la mayor parte del **código Java** (estado, operadores, experimentos y gráficas). Biel participó de forma más limitada en la implementación, pero asistió a las reuniones, colaboró en partes de los experimentos y en la preparación de figuras, y los **tres** redactaron el informe final.
 
-El repositori es divideix en carpetes segons la funció que desenvolupen:
+## Estructura del proyecto {.unnumbered}
+
+El repositorio se divide en carpetas según la función que desempeñan:
 
 ```text
 repo_PRAC1/
 ├── src/
-│   └── IA/PracticaEnergia/   Codi propi de la pràctica.
+│   └── IA/PracticaEnergia/   Código propio de la práctica.
 ├── lib/
-│   ├── *CentralEnergia.jar*    Biblioteca del problema energètic.
-│   ├── *AIMA.jar*              Biblioteca d'algorismes de cerca.
-│   └── *lib/*                  Dependències distribuïdes amb AIMA.
+│   ├── *CentralEnergia.jar*    Biblioteca del problema energético.
+│   ├── *AIMA.jar*              Biblioteca de algoritmos de búsqueda.
+│   └── *lib/*                  Dependencias distribuidas con AIMA.
 ├── docs/
-│   ├── *aima-src/*             Codi font d'AIMA per a consulta.
-│   └── *javadoc/*              Documentació de CentralEnergia.jar.
-├── results/                  Resultats dels experiments i figures.
-├── report/                   Font Quarto i fitxers de l'informe.
-├── out/                      Classes compilades de Java.
-├── *README.md*               Instruccions d'ús i reproducció.
-└── *.gitignore*              Regles de Git per al repositori.
+│   ├── *aima-src/*             Código fuente de AIMA para consulta.
+│   └── *javadoc/*              Documentación de CentralEnergia.jar.
+├── results/                  Resultados de los experimentos y figuras.
+├── report/                   Fuente Quarto y archivos del informe.
+├── out/                      Clases compiladas de Java.
+├── *README.md*               Instrucciones de uso y reproducción.
+└── *.gitignore*              Reglas de Git para el repositorio.
 ```
 
-La carpeta `src/IA/PracticaEnergia/` conté el **codi desenvolupat pel grup**. Els
-fitxers més importants són:
+La carpeta `src/IA/PracticaEnergia/` contiene el **código desarrollado por el grupo**. Los
+archivos más importantes son:
 
-- `EstadoEnergia.java`: representa un estat i implementa les operacions sobre les assignacions de clients a centrals.
+- `EstadoEnergia.java`: representa un estado e implementa las operaciones sobre las asignaciones de clientes a centrales.
 
-- `GeneradorSucesoresHC.java` i `GeneradorSucesoresSA.java`: generen, respectivament, els veïns de Hill Climbing i un successor aleatori per a Simulated Annealing.
+- `GeneradorSucesoresHC.java` y `GeneradorSucesoresSA.java`: generan, respectivamente, los vecinos de Hill Climbing y un sucesor aleatorio para Simulated Annealing.
 
-- `FuncionHeuristica.java`: defineix les funcions que avaluen la qualitat dels estats.
+- `FuncionHeuristica.java`: define las funciones que evalúan la calidad de los estados.
 
-- `Ejecucion.java`: connecta el problema amb els algorismes d'AIMA i recull les mètriques de cada execució.
+- `Ejecucion.java`: conecta el problema con los algoritmos de AIMA y recoge las métricas de cada ejecución.
 
-- `MainExperimentos.java`: executa la bateria d'experiments i desa els resultats en fitxers CSV.
+- `MainExperimentos.java`: ejecuta la batería de experimentos y guarda los resultados en archivos CSV.
 
-- `Graficas.java`: llegeix els CSV i genera les figures del report.
+- `Graficas.java`: lee los CSV y genera las figuras del informe.
 
-- `Comparaciones.java`: realitza les comparacions estadístiques entre configuracions.
+- `Comparaciones.java`: realiza las comparaciones estadísticas entre configuraciones.
 
-- `PruebaEstado.java`: comprova la coherència de la representació, els operadors i les solucions inicials.
+- `PruebaEstado.java`: comprueba la coherencia de la representación, los operadores y las soluciones iniciales.
 
-`lib/` i `docs/` són **material extern** que no forma part del codi desenvolupat pel grup.
+`lib/` y `docs/` son **material externo** que no forma parte del código desarrollado por el grupo.
 
-La carpeta `lib/` conté les **biblioteques necessàries per compilar i executar el projecte**. `docs/` conserva el **material de consulta**, `results/` conté els
-**resultats generats pels experiments** i `report/` conté la **font i el PDF de l'informe**. La carpeta `out/` és un directori generat durant la compilació i
-conté els fitxers `.class`; no és codi font.
+La carpeta `lib/` contiene las **bibliotecas necesarias para compilar y ejecutar el proyecto**. `docs/` conserva el **material de consulta**, `results/` contiene los
+**resultados generados por los experimentos** y `report/` contiene la **fuente y el PDF del informe**. La carpeta `out/` es un directorio generado durante la compilación y
+contiene los archivos `.class`; no es código fuente.
 
-## Context i materials
+## Contexto y materiales
 
-En aquest apartat es descriuen les dependències i la manera com es connecten entre si els components del projecte.
+En este apartado se describen las dependencias y la forma en que se conectan entre sí los componentes del proyecto.
 
-### Codi propi
+### Código propio
 
 *src/*
 
-El codi propi, que es troba a la carpeta `src/`, està organitzat en el paquet
+El código propio, ubicado en la carpeta `src/`, está organizado en el paquete
 **`IA.PracticaEnergia`**.
 
-Aquest paquet conté la **representació del problema** (EstadoEnergia), els **operadors i generadors de successors**, les **funcions heurístiques**, l’**execució dels algoritmes**, els **experiments** i la **generació de gràfiques**.
+Este paquete contiene la **representación del problema** (EstadoEnergia), los **operadores y generadores de sucesores**, las **funciones heurísticas**, la **ejecución de los algoritmos**, los **experimentos** y la **generación de gráficas**.
 
 ### Biblioteca del problema
 
 *lib/CentralEnergia.jar*/
 
-La biblioteca del problema està formada per les classes i funcions necessàries per resoldre el problema de distribució d'energia elèctrica.
+La biblioteca del problema está formada por las clases y funciones necesarias para resolver el problema de distribución de energía eléctrica.
 
-El fitxer `lib/CentralEnergia.jar`, proporcionat amb l'enunciat, conté les
-classes de suport agrupades en el paquet **`IA.Energia`**. En concret:
+El archivo `lib/CentralEnergia.jar`, proporcionado con el enunciado, contiene las
+clases de soporte agrupadas en el paquete **`IA.Energia`**. En concreto:
 
-- `Central` i `Centrales` representen les centrals elèctriques.
-- `Cliente` i `Clientes` representen els clients, el seu consum i el tipus de
-  contracte.
-- `VEnergia` proporciona constants i funcions del model, com els costos de les
-  centrals i les pèrdues de transport.
+- `Central` y `Centrales` representan las centrales eléctricas.
+- `Cliente` y `Clientes` representan los clientes, su consumo y el tipo de
+  contrato.
+- `VEnergia` proporciona constantes y funciones del modelo, como los costes de las
+  centrales y las pérdidas de transporte.
 
-El paquet `IA.Energia` proporciona, per tant, les dades i les fórmules bàsiques
-del problema. El paquet propi `IA.PracticaEnergia` les utilitza per construir
-`EstadoEnergia`, precalcular les magnituds del problema i comprovar si una
-assignació respecta les capacitats i els contractes garantits. Per exemple:
+El paquete `IA.Energia` proporciona, por tanto, los datos y las fórmulas básicas
+del problema. El paquete propio `IA.PracticaEnergia` los utiliza para construir
+`EstadoEnergia`, precalcular las magnitudes del problema y comprobar si una
+asignación respeta las capacidades y los contratos garantizados. Por ejemplo:
 
 ```java
 import IA.Energia.Central;
@@ -139,525 +142,531 @@ import IA.Energia.Clientes;
 import IA.Energia.VEnergia;
 ```
 
-La implementació de `IA.Energia` no forma part del codi del grup: es carrega des
-de `CentralEnergia.jar`. La seva API es pot consultar a `docs/javadoc/`.
+La implementación de `IA.Energia` no forma parte del código del grupo: se carga desde
+`CentralEnergia.jar`. Su API puede consultarse en `docs/javadoc/`.
 
-### Biblioteca d'algorismes
+### Biblioteca de algoritmos
 
 *lib/AIMA.jar*
 
-`lib/AIMA.jar` proporciona els **algorismes i les interfícies generals de cerca** d'AIMA. Entre les classes que utilitza el projecte hi ha:
+`lib/AIMA.jar` proporciona los **algoritmos y las interfaces generales de búsqueda** de AIMA. Entre las clases que utiliza el proyecto están:
 
-- `Problem`, `SearchAgent` i `Successor`, que permeten definir i executar un
-  problema de cerca.
-- `SuccessorFunction`, `GoalTest` i `HeuristicFunction`, que són les
-  interfícies que implementa o utilitza el codi propi.
-- `HillClimbingSearch` i `SimulatedAnnealingSearch`, que són els dos
-  algoritmes de cerca local emprats.
+- `Problem`, `SearchAgent` y `Successor`, que permiten definir y ejecutar un
+  problema de búsqueda.
+- `SuccessorFunction`, `GoalTest` y `HeuristicFunction`, que son las
+  interfaces que implementa o utiliza el código propio.
+- `HillClimbingSearch` y `SimulatedAnnealingSearch`, que son los dos
+  algoritmos de búsqueda local empleados.
 
-Aquestes classes pertanyen principalment als paquets `aima.search.framework` i
-`aima.search.informed`. AIMA proporciona la infraestructura i els algoritmes,
-però la representació de l'estat, els operadors i les funcions heurístiques
-concretes de la pràctica s'implementen a `IA.PracticaEnergia`.
+Estas clases pertenecen principalmente a los paquetes `aima.search.framework` y
+`aima.search.informed`. AIMA proporciona la infraestructura y los algoritmos,
+pero la representación del estado, los operadores y las funciones heurísticas
+concretas de la práctica se implementan en `IA.PracticaEnergia`.
 
-### Dependències de gràfiques
+### Dependencias de gráficas
 
 *lib/lib/*
 
-La classe `Graficas` (del paquet `IA.PracticaEnergia`) llegeix els fitxers CSV dels experiments i genera les figures PNG del report.
+La clase `Graficas` (del paquete `IA.PracticaEnergia`) lee los archivos CSV de los experimentos y genera las figuras PNG del informe.
 
-Per fer-ho utilitza **JFreeChart**, principalment els paquets `org.jfree.chart` i `org.jfree.data`.
+Para ello utiliza **JFreeChart**, principalmente los paquetes `org.jfree.chart` y `org.jfree.data`.
 
-Els JAR necessaris es troben a `lib/lib/`, una carpeta amb dependències d'AIMA que s'ha mantingut dins del repositori per a l'execució del projecte. En particular:
+Los JAR necesarios se encuentran en `lib/lib/`, una carpeta con dependencias de AIMA que se ha mantenido en el repositorio para la ejecución del proyecto. En particular:
 
-- `jfreechart-1.0.13.jar` conté la biblioteca de gràfiques.
-- `jcommon-1.0.16.jar` conté classes comunes que JFreeChart necessita.
+- `jfreechart-1.0.13.jar` contiene la biblioteca de gráficas.
+- `jcommon-1.0.16.jar` contiene clases comunes que JFreeChart necesita.
 
-Dins de `lib/lib` també hi ha altres dependències distribuïdes amb AIMA, com `iText`, `JUnit` i components gràfics, però no totes són necessàries per executar aquesta pràctica.
+Dentro de `lib/lib` también hay otras dependencias distribuidas con AIMA, como `iText`, `JUnit` y componentes gráficos, pero no todas son necesarias para ejecutar esta práctica.
 
-La carpeta es conserva perquè `AIMA.jar` declara part d'aquestes dependències amb rutes relatives `lib/...` i perquè `Graficas.java` necessita JFreeChart per generar les figures.
+La carpeta se conserva porque `AIMA.jar` declara parte de estas dependencias con rutas relativas `lib/...` y porque `Graficas.java` necesita JFreeChart para generar las figuras.
 
-Durant l'execució de `Graficas` aquestes classes es carreguen juntament amb el
-codi propi.
+Durante la ejecución de `Graficas` estas clases se cargan junto con el
+código propio.
 
 ### Material de consulta
 
 *docs/*
 
-`docs/` conté **material de consulta** que no forma part del codi desenvolupat pel grup:
+`docs/` contiene **material de consulta** que no forma parte del código desarrollado por el grupo:
 
-- `docs/aima-src/` és el **codi font d'AIMA** lliurat com a material docent i **consultat per entendre el comportament dels algorismes**. Serveix per consultar com funcionen internament les classes utilitzades pel projecte, especialment `HillClimbing` i `SimulatedAnnealing`. També inclou **exemples i demostracions docents**, en les subcarpetes `Demos/`, `IA` i `aima`.
+- `docs/aima-src/` es el **código fuente de AIMA** entregado como material docente y **consultado para entender el comportamiento de los algoritmos**. Sirve para revisar cómo funcionan internamente las clases usadas por el proyecto, especialmente `HillClimbing` y `SimulatedAnnealing`. También incluye **ejemplos y demostraciones docentes**, en las subcarpetas `Demos/`, `IA` y `aima`.
 
-- `docs/javadoc/` conté **documentació HTML de l'API de `CentralEnergia.jar`** generada amb Javadoc i conservada com a material de consulta. La documentació principal correspon al paquet `IA.Energia` i inclou `Central.html`, `Centrales.html`, `Cliente.html`, `Clientes.html` i `VEnergia.html`. També conté els recursos auxiliars per navegar per la documentació HTML.
+- `docs/javadoc/` contiene **documentación HTML de la API de `CentralEnergia.jar`** generada con Javadoc y conservada como material de consulta. La documentación principal corresponde al paquete `IA.Energia` e incluye `Central.html`, `Centrales.html`, `Cliente.html`, `Clientes.html` y `VEnergia.html`. También contiene los recursos auxiliares para navegar por la documentación HTML.
 
-*Les carpetes anteriors serveixen per consultar les interfícies i les implementacions de suport, però no formen part del codi desenvolupat pel grup i no es modifiquen.*
+*Las carpetas anteriores sirven para consultar las interfaces y las implementaciones de soporte, pero no forman parte del código desarrollado por el grupo y no se modifican.*
 
-### Com es connecta tot (compilació i execució)
+### Cómo se conecta todo (compilación y ejecución)
 
-(1) **Durant la compilació**, els JAR que contenen les dependències principals
-(`CentralEnergia.jar` i `AIMA.jar`) s'afegeixen al *classpath*:
+(1) **Durante la compilación**, los JAR que contienen las dependencias principales
+(`CentralEnergia.jar` y `AIMA.jar`) se añaden al *classpath*:
 
 ```powershell
 javac -Xlint:all,-path -cp "lib\CentralEnergia.jar;lib\AIMA.jar" `
-  -d out (Get-ChildItem -Recurse src -Filter *.java | % FullName)
+  -d out (Get-ChildItem -Recurse src -Filter *.java | Where-Object { $_.Name -ne 'Prueba0.java' } | % FullName)
 ```
 
-Això permet que el compilador resolgui les classes dels paquets **`IA.Energia`**
-i **`aima.search`**. El resultat del codi propi es desa a `out/`.
+Esto permite que el compilador resuelva las clases de los paquetes **`IA.Energia`**
+y **`aima.search`**. El resultado del código propio se guarda en `out/`.
 
-(2) **Durant l'execució**, `out/` i les biblioteques s'inclouen al *classpath*:
+(2) **Durante la ejecución**, `out/` y las bibliotecas se incluyen en el *classpath*:
 
 ```powershell
 java -cp "out;lib\CentralEnergia.jar;lib\AIMA.jar;lib\lib\*" `
   IA.PracticaEnergia.MainExperimentos smoke
 ```
 
-Les classes de **`IA.PracticaEnergia`** es carreguen des de `out/`, mentre que
-les classes de **`IA.Energia`**, `aima.search` i `org.jfree` es carreguen des
-dels fitxers JAR.
+Las clases de **`IA.PracticaEnergia`** se cargan desde `out/`, mientras que
+las clases de **`IA.Energia`**, `aima.search` y `org.jfree` se cargan desde
+los archivos JAR.
 
-No cal descomprimir-los: el *classpath* indica a Java on ha de trobar les classes compilades.
+No hace falta descomprimirlos: el *classpath* indica a Java dónde encontrar las clases compiladas.
 
 
-## Anàlisi del problema
+## Análisis del problema
 
-### Definició del problema
+### Definición del problema
 
-El problema consisteix en la planificació de l'assignació de clients a centrals d'energia, amb l'objectiu de maximitzar el benefici net. Això implica prendre decisions sobre quins clients assignar a quines centrals, tenint en compte les restriccions de capacitat i els costos associats.
+El problema consiste en planificar la asignación de clientes a centrales eléctricas con el objetivo de maximizar el beneficio neto. Implica decidir qué clientes asignar a qué centrales respetando capacidad y costes.
 
-*La descripció formal i completa del problema es troba a l'apartat 4 del document `PracticaBusqueda-local.pdf`. Aquí destacarem únicament els punts més rellevants per entendre la implementació i els experiments realitzats.*
+*La descripción formal y completa del problema está en el apartado 4 del documento `PracticaBusqueda-local.pdf`. Aquí se destacan solo los puntos más relevantes para la implementación y los experimentos.*
 
-Una solució assigna a cada client **com a màxim una** central, o cap si és un **client no garantitzat** al qual es decideix no servir. El criteri a maximitzar és
+Una solución asigna a cada cliente **como máximo una** central, o ninguna si es un **cliente no garantizado** al que se decide no servir. El criterio a maximizar es
+
+El coste de cada central depende de si está **activa** (con al menos un cliente asignado) o **parada**; en la fórmula se resume como «coste de las centrales» sin desarrollar el caso en una sola línea.
 
 $$
-\text{benefici} = \text{ingressos dels clients servits} - \text{cost de les centrals (activa si tenen algun client, parada si no)} - \text{indemnitzacions dels clients no garantits no servits}.
+\begin{aligned}
+\text{beneficio} &= \text{ingresos de los clientes servidos} \\
+&\quad - \text{coste de las centrales (activas o paradas)} \\
+&\quad - \text{indemnizaciones de clientes no garantizados no servidos}.
+\end{aligned}
 $$
 
-Hi ha dues propietats de l’enunciat que condicionen tot el disseny i que convé tenir presents perquè expliquen gairebé tots els resultats experimentals:
+Hay dos propiedades del enunciado que condicionan todo el diseño y conviene tener presentes porque explican casi todos los resultados experimentales:
 
-1. **Una central en marxa costa tota la seva producció, s'usi o no.**
+1. **Una central en marcha cuesta toda su producción, se use o no.**
 
-El cost no depèn de quanta energia es serveixi des d'ella, només de si està engegada. És a dir, **el cost marginal d'afegir un client a una central ja engegada és exactament zero**.
+El coste no depende de cuánta energía se sirva desde ella, solo de si está encendida. Es decir, **el coste marginal de añadir un cliente a una central ya encendida es exactamente cero**.
 
-2. **Les pèrdues de transport no són un cost en euros, són un consum de capacitat.**
+2. **Las pérdidas de transporte no son un coste en euros, sino un consumo de capacidad.**
 
-Al client se li factura el seu consum contractat; el que canvia amb la distància és quants Mw cal produir: `mw = consum / (1 - pèrdua(distància))`, fins a 2,5 vegades el consum si la central està a més de 75 km.
+Al cliente se le factura su consumo contratado; lo que cambia con la distancia es cuántos MW hay que producir: `mw = consumo / (1 - pérdida(distancia))`, hasta 2,5 veces el consumo si la central está a más de 75 km.
 
 
-De la primera propietat se’n dedueix una cosa que resulta decisiva: **el benefici no depèn de com es reparteixin els clients, sinó només de quines centrals estan enceses i de quins clients queden sense servir.**
+De la primera propiedad se deduce algo decisivo: **el beneficio no depende de cómo se reparten los clientes, sino solo de qué centrales están encendidas y de qué clientes quedan sin servir.**
 
-El repartiment concret només importa de manera indirecta, perquè determina si el repartiment és possible. Ho desenvoluparem a l'apartat **Espai de solucions**.
+El reparto concreto solo importa de manera indirecta, porque determina si la asignación es factible. Lo desarrollaremos en el apartado **Espacio de soluciones**.
 
-És un **problema de cerca local**, i no de cerca en un espai d’estats clàssic, per tres raons.
+Es un **problema de búsqueda local**, y no de búsqueda en un espacio de estados clásico, por tres razones.
 
-1. No existeix un estat objectiu reconeixible: **qualsevol assignació vàlida és una solució** i el que es busca és la millor, no una concreta.
+1. No existe un estado objetivo reconocible: **cualquier asignación válida es una solución** y lo que se busca es la mejor, no una concreta.
 
-2. **L’espai és inabastable** (vegeu **Mida de l'espai de solucions**), així que no es pot explorar de manera sistemàtica ni limitar amb una heurística admissible.
+2. **El espacio es inabordable** (@sec-tamano-espacio), así que no puede explorarse de forma sistemática ni acotarse con una heurística admisible.
 
-3. **I el camí fins a la solució no té cap valor**: només interessa l’estat final, no la seqüència d’operadors que hi porta.
+3. **El camino hasta la solución no aporta valor**: solo interesa el estado final, no la secuencia de operadores que conduce a él.
 
-### Mida de l'espai de solucions
+### Tamaño del espacio de soluciones {#sec-tamano-espacio}
 
-Cada client pot estar en qualsevol de les `nCentrals` centrals o sense servir, així que hi ha de l'ordre de `(nCentrals + 1)^nClients` combinacions, que en l'escenari base són `41^1000`, un nombre d'unes 1.600 xifres.
+Cada cliente puede estar en cualquiera de las `nCentrales` centrales o sin servir, así que hay del orden de `(nCentrales + 1)^nClientes` combinaciones, que en el escenario base son `41^1000`, un número de unas 1.600 cifras.
 
-Només una fracció compleix les restriccions de capacitat i de servei garantit, però continua sent una **fracció immensament gran**.
+Solo una fracción cumple las restricciones de capacidad y de servicio garantizado, pero sigue siendo una **fracción inmensa**.
 
-Convé contrastar-ho amb la dimensió que de veritat determina el benefici. Pel que s'ha dit a **Definició del problema**, el benefici només depèn de **quines centrals estan enceses** (40 variables binàries, `2^40` combinacions) i de **quins no garantits es serveixen**.
+Conviene contrastarlo con la dimensión que realmente determina el beneficio. Por lo dicho en **Definición del problema**, el beneficio solo depende de **qué centrales están encendidas** (40 variables binarias, `2^40` combinaciones) y de **qué no garantizados se sirven**.
 
-**L'espai d'assignacions és enormement més gran que l'espai de decisions que afecten l'objectiu**, i aquesta desproporció és exactament la que produeix les mesetes que s'expliquen a **Espai de solucions**.
+**El espacio de asignaciones es enormemente mayor que el espacio de decisiones que afectan al objetivo**, y esa desproporción es la que produce las mesetas explicadas en **Espacio de soluciones**.
 
-### Observacions sobre la representació i els criteris de validesa
+### Observaciones sobre la representación y los criterios de validez
 
-Abans de definir la representació interna, convé distingir entre un **estat** i una **solució vàlida**. Un estat és una assignació concreta dels clients a les centrals, mentre que **és solució vàlida quan compleix totes les restriccions del problema**. En particular:
+Antes de definir la representación interna, conviene distinguir entre un **estado** y una **solución válida**. Un estado es una asignación concreta de clientes a centrales, mientras que **es solución válida cuando cumple todas las restricciones del problema**. En particular:
 
-- Cada client pot estar assignat a una única central o quedar sense servir;
+- Cada cliente puede estar asignado a una única central o quedar sin servir;
 
-- Cap central pot superar la seva capacitat de producció, tenint en compte les pèrdues de transport;
+- Ninguna central puede superar su capacidad de producción, teniendo en cuenta las pérdidas de transporte;
 
-- Tots els clients amb contracte garantit han de rebre servei;
+- Todos los clientes con contrato garantizado deben recibir servicio;
 
-- Els clients no garantits poden quedar sense assignar, però això redueix el benefici perquè cal pagar-ne la indemnització.
+- Los clientes no garantizados pueden quedar sin asignar, pero eso reduce el beneficio porque hay que pagar su indemnización.
 
-Per tant, **no tots els estats del domini combinatori descrit a “Mida de l'espai de solucions” són factibles**. Aquests criteris de validesa s'especifiquen internament en el codi del projecte.
+Por tanto, **no todos los estados del dominio combinatorio descrito en @sec-tamano-espacio son factibles**. Estos criterios de validez se especifican internamente en el código del proyecto.
 
-La representació i els operadors descarten les assignacions que superen la capacitat d'una central i, en el funcionament normal, impedeixen desassignar clients garantits.
+La representación y los operadores descartan las asignaciones que superen la capacidad de una central y, en el funcionamiento normal, impiden desasignar clientes garantizados.
 
-Aquesta elecció incorpora les **restriccions** en la
-generació de successors i evita que els algoritmes hagin d'explorar una gran quantitat d'estats impossibles.
+Esta elección incorpora las **restricciones** en la
+generación de sucesores y evita que los algoritmos deban explorar una gran cantidad de estados imposibles.
 
-## Espai de solucions
+## Espacio de soluciones
 
-Després d'haver definit el problema i d'haver analitzat la seva mida, aquest apartat concreta com es representa i s'explora l'espai de solucions en el programa.
+Después de haber definido el problema y analizado su tamaño, este apartado concreta cómo se representa y explora el espacio de soluciones en el programa.
 
-Es descriuen els estats inicials, l'estructura i la qualitat dels estats, la seva construcció en el codi i els operadors que defineixen el veïnatge.
+Se describen los estados iniciales, la estructura y la calidad de los estados, su construcción en el código y los operadores que definen el vecindario.
 
-### Solucions i estats inicials
+### Soluciones y estados iniciales
 
-La cerca local necessita un estat inicial, però no parteix d'una solució òptima.
+La búsqueda local necesita un estado inicial, pero no parte de una solución óptima.
 
-El projecte implementa dues estratègies principals:
+El proyecto implementa dos estrategias principales:
 
-- **ALEATORIA**: recorre els clients garantits en un ordre aleatori i els assigna a una de les vuit centrals més properes que encara tenen capacitat.
+- **ALEATORIA**: recorre los clientes garantizados en un orden aleatorio y los asigna a una de las ocho centrales más cercanas que aún tienen capacidad.
 
-Si cap d'aquestes no hi cap, busca una altra central amb capacitat per no incomplir el servei garantit. Els clients no garantits comencen sense servir.
+Si ninguna de estas tiene cabida, busca otra central con capacidad para no incumplir el servicio garantizado. Los clientes no garantizados empiezan sin servir.
 
-Aquesta estratègia permet estudiar l'efecte de la posició inicial, però pot encendre més centrals o aprofitar pitjor la capacitat disponible.
+Esta estrategia permite estudiar el efecto de la posición inicial, pero puede encender más centrales o aprovechar peor la capacidad disponible.
 
-- **VORAZ**: ordena primer els clients garantits segons el consum i intenta reutilitzar les centrals ja enceses. Només obre una central nova quan és necessari, i posteriorment assigna clients no garantits a l'espai que queda lliure. Com que el cost d'una central encesa ja s'ha pagat, afegir-hi un client que hi cap no té cost marginal de producció i pot augmentar el benefici.
+- **VORAZ**: ordena primero los clientes garantizados según el consumo e intenta reutilizar las centrales ya encendidas. Solo abre una central nueva cuando es necesario y, después, asigna clientes no garantizados al espacio libre. Como el coste de una central ya encendida ya está pagado, añadirle un cliente que cabe no tiene coste marginal de producción y puede aumentar el beneficio.
 
-Ambdues estratègies **prioritzen les centrals més properes**. Això redueix les pèrdues de transport i evita que una assignació aleatòria consumeixi tota la capacitat disponible abans d'haver servit els clients garantits.
+Ambas estrategias **priorizan las centrales más cercanas**. Esto reduce las pérdidas de transporte y evita que una asignación aleatoria consuma toda la capacidad disponible antes de haber servido a los clientes garantizados.
 
-La llavor del generador aleatori es fixa per poder reproduir exactament una solució inicial aleatòria.
+La semilla del generador aleatorio es fija para poder reproducir exactamente una solución inicial aleatoria.
 
-La classe `PruebaEstado` comprova que les dues construccions són coherents i que serveixen tots els clients garantits.
+La clase `PruebaEstado` comprueba que las dos construcciones son coherentes y que sirven a todos los clientes garantizados.
 
-També verifica que la solució voraz obté un benefici superior a la solució aleatòria en l'escenari de prova.
+También verifica que la solución voraz obtiene un beneficio superior a la aleatoria en el escenario de prueba.
 
-Això no implica que la solució voraz sigui òptima: només proporciona un punt de partida de més qualitat per a la cerca local.
+Esto no implica que la solución voraz sea óptima: solo proporciona un punto de partida de mayor calidad para la búsqueda local.
 
-### Estructura i qualitat dels estats
+### Estructura y calidad de los estados
 
-Una assignació concreta pot tenir molts estats equivalents des del punt de vista del benefici. Si dos estats serveixen els mateixos clients i mantenen enceses les mateixes centrals, el benefici és el mateix encara que alguns clients estiguin distribuïts de manera diferent entre aquestes centrals.
+Una asignación concreta puede tener muchos estados equivalentes desde el punto de vista del beneficio. Si dos estados sirven a los mismos clientes y mantienen encendidas las mismas centrales, el beneficio es el mismo aunque algunos clientes estén repartidos de forma distinta entre esas centrales.
 
-Les distàncies sí que poden canviar les pèrdues i la capacitat disponible, però no constitueixen directament un cost monetari: afecten la factibilitat perquè determinen els megawatts que cal produir.
+Las distancias sí pueden cambiar las pérdidas y la capacidad disponible, pero no constituyen directamente un coste monetario: afectan la factibilidad porque determinan los megavatios que hay que producir.
 
-Aquesta propietat crea **mesetes** en la funció objectiu. Per exemple, moure un client entre dues centrals que ja estan enceses pot no modificar ni els ingressos ni el cost de les centrals.
+Esta propiedad crea **mesetas** en la función objetivo. Por ejemplo, mover un cliente entre dos centrales ya encendidas puede no modificar ni los ingresos ni el coste de las centrales.
 
-Un Hill Climbing basat només en el benefici no considera aquest moviment una millora i pot aturar-se encara que un conjunt de moviments posteriors permetés apagar una central.
+Un Hill Climbing basado solo en el beneficio no considera ese movimiento una mejora y puede detenerse aunque una secuencia posterior de movimientos permitiera apagar una central.
 
-Per això són rellevants els operadors d'assignació i de gestió de centrals, així com les heurístiques que penalitzen les pèrdues o la capacitat ociosa.
+Por eso son relevantes los operadores de asignación y de gestión de centrales, así como las heurísticas que penalizan las pérdidas o la capacidad ociosa.
 
-Finalment, **els estats es poden comparar** mitjançant el benefici, però també mitjançant mesures auxiliars: nombre de clients servits, clients garantits no servits, centrals enceses, megawatts perduts i capacitat desaprofitada.
+Finalmente, **los estados pueden compararse** mediante el beneficio, pero también mediante medidas auxiliares: número de clientes servidos, garantizados no servidos, centrales encendidas, megavatios perdidos y capacidad desaprovechada.
 
-Aquestes magnituds permeten analitzar si una millora del benefici s'obté servint més clients, reduint costos d'activació o aprofitant millor la capacitat.
+Estas magnitudes permiten analizar si una mejora del beneficio se obtiene sirviendo más clientes, reduciendo costes de activación o aprovechando mejor la capacidad.
 
-### Construcció dels estats en el codi
+### Construcción de los estados en el código
 
 *src/IA/PracticaEnergia/EstadoEnergia.java*
 
-La classe `EstadoEnergia` és la representació concreta de cada estat. La **part variable** es manté amb tres vectors:
+La clase `EstadoEnergia` es la representación concreta de cada estado. La **parte variable** se mantiene con tres vectores:
 
-- `asignacion`, indexat pel client, conté l'identificador de la central on està assignat o `-1` (`SIN_ASIGNAR`) si no rep servei;
+- `asignacion`, indexado por cliente, contiene el identificador de la central asignada o `-1` (`SIN_ASIGNAR`) si no recibe servicio;
 
-- `ocupacion` indica els megawatts de producció compromesos a cada central, incloent-hi les pèrdues de transport;
+- `ocupacion` indica los megavatios de producción comprometidos en cada central, incluidas las pérdidas de transporte;
 
-- `clientesPorCentral` compta els clients de cada central i permet saber si està encesa.
+- `clientesPorCentral` cuenta los clientes de cada central y permite saber si está encendida.
 
-La resta de camps dinàmics, com el benefici, el nombre de centrals enceses, els megawatts produïts i els clients garantits sense servir, també es mantenen de manera incremental.
+El resto de campos dinámicos —beneficio, número de centrales encendidas, megavatios producidos y garantizados sin servir— también se mantienen de forma incremental.
 
-Així, quan es crea un successor, el constructor de còpia clona els tres vectors i els valors numèrics, i l'operador només actualitza les diferències produïdes. No cal reconstruir ni recórrer tota l'assignació per recalcular el benefici.
+Así, al crear un sucesor, el constructor de copia clona los tres vectores y los valores numéricos, y el operador solo actualiza las diferencias producidas. No hace falta reconstruir ni recorrer toda la asignación para recalcular el beneficio.
 
-**Les dades que no canvien entre estats** es precalculen una sola vegada a `inicializaEscenario`: costos i produccions de les centrals, ingressos i penalitzacions dels clients, i els megawatts necessaris per servir cada parella client-central.
+**Los datos que no cambian entre estados** se precalculan una sola vez en `inicializaEscenario`: costes y producciones de las centrales, ingresos y penalizaciones de los clientes, y megavatios necesarios para servir cada par cliente-central.
 
-També es guarden les `k` centrals més properes a cada client i
-els `k` clients més propers, que limiten el veïnatge. Aquesta separació redueix la memòria necessària per estat i fa que els successors siguin independents del seu estat pare. (Veure apartat *Operadors i definició del veïnatge* per més detalls sobre el paràmetre `k`.)
+También se guardan las `k` centrales más cercanas a cada cliente y
+los `k` clientes más cercanos, que limitan el vecindario. Esta separación reduce la memoria necesaria por estado y hace que los sucesores sean independientes de su estado padre. (Véase @sec-operadores-vecindario para más detalles sobre el parámetro `k`.)
 
-El constructor inicial parteix de tots els clients sense servir i totes les centrals parades.
+El constructor inicial parte de todos los clientes sin servir y de todas las centrales paradas.
 
-En aquest punt el benefici inclou el cost de mantenir les centrals parades i, si escau, les indemnitzacions.
+En ese punto el beneficio incluye el coste de mantener las centrales paradas y, si procede, las indemnizaciones.
 
-A continuació aplica `ALEATORIA`, `VORAZ` o `VACIA`.
+A continuación aplica `ALEATORIA`, `VORAZ` o `VACIA`.
 
-Aquesta última només s'utilitza en el mode experimental que permet penalitzar el servei garantit no satisfet.
+Esta última solo se utiliza en el modo experimental que permite penalizar el servicio garantizado no satisfecho.
 
-### Operadors i definició del veïnatge
+### Operadores y definición del vecindario {#sec-operadores-vecindario}
 
 *src/IA/PracticaEnergia/ConjuntoOperadores.java*
 *src/IA/PracticaEnergia/GeneradorSucesoresHC.java*
 *src/IA/PracticaEnergia/GeneradorSucesoresSA.java*
 
-Un **operador** transforma un estat en un estat veí sempre que el moviment sigui legal.
+Un **operador** transforma un estado en un estado vecino siempre que el movimiento sea legal.
 
-El projecte implementa els operadors següents:
+El proyecto implementa los operadores siguientes:
 
-- **MOVER**: canvia un client servit a una altra central propera si hi ha capacitat. Pot reduir les pèrdues, però normalment no canvia el benefici si les dues centrals ja estaven enceses.
+- **MOVER**: cambia un cliente servido a otra central cercana si hay capacidad. Puede reducir las pérdidas, pero normalmente no cambia el beneficio si ambas centrales ya estaban encendidas.
 
-- **ASIGNAR/DESASIGNAR**: dona o retira el servei d'un client. En el mode normal només es poden desassignar clients no garantits; en el mode de penalització també es poden deixar sense servir clients garantits.
+- **ASIGNAR/DESASIGNAR**: da o retira el servicio a un cliente. En el modo normal solo se pueden desasignar clientes no garantizados; en el modo de penalización también se pueden dejar sin servir clientes garantizados.
 
-- **INTERCAMBIAR**: intercanvia les centrals de dos clients servits. La comprovació calcula la capacitat disponible després de retirar els dos clients, de manera que l'intercanvi es fa de forma simultània i no genera estats intermedis impossibles.
+- **INTERCAMBIAR**: intercambia las centrales de dos clientes servidos. La comprobación calcula la capacidad disponible después de retirar a ambos, de modo que el intercambio es simultáneo y no genera estados intermedios imposibles.
 
-- **ABRIR**: encén una central parada i hi assigna tants clients no servits com permet la seva capacitat, prioritzant la densitat de benefici per megawatt.
+- **ABRIR**: enciende una central parada y le asigna tantos clientes no servidos como permita su capacidad, priorizando la densidad de beneficio por megavatio.
 
-- **CERRAR**: apaga una central i intenta reubicar tots els seus clients en altres centrals. Si algun client no hi cap, el successor es descarta.
+- **CERRAR**: apaga una central e intenta reubicar a todos sus clientes en otras centrales. Si alguno no cabe, el sucesor se descarta.
 
-Els dos darrers són operadors compostos. Són necessaris perquè un moviment individual pot deixar el benefici inalterat, mentre que buidar una central permet estalviar-ne el cost d'activació en una sola transició. Per evitar duplicats, l'intercanvi només es genera una vegada per cada parella de clients.
+Los dos últimos son operadores compuestos. Son necesarios porque un movimiento individual puede dejar el beneficio inalterado, mientras que vaciar una central permite ahorrar el coste de activación en una sola transición. Para evitar duplicados, el intercambio solo se genera una vez por cada pareja de clientes.
 
-Els operadors compostos són importants perquè Hill Climbing només accepta una
-transició quan millora estrictament el criteri. Si cal moure molts clients per
-deixar una central buida i poder estalviar-ne el cost, els moviments
-individuals intermedis poden tenir exactament el mateix benefici i formar una
-meseta. `ABRIR` i `CERRAR` fan el canvi rellevant en una sola transició i
-permeten que la cerca detecti directament la millora completa. No són una
-heurística diferent, sinó una manera més expressiva de definir el veïnatge.
+Los operadores compuestos son importantes porque Hill Climbing solo acepta una
+transición cuando mejora estrictamente el criterio. Si hace falta mover a muchos clientes para
+dejar una central vacía y ahorrar su coste, los movimientos
+individuales intermedios pueden tener exactamente el mismo beneficio y formar una
+meseta. `ABRIR` y `CERRAR` realizan el cambio relevante en una sola transición y
+permiten que la búsqueda detecte directamente la mejora completa. No son una
+heurística distinta, sino una forma más expresiva de definir el vecindario.
 
-Les **comprovacions** es fan abans de crear el successor i incorporen la capacitat de la central i la restricció dels clients garantits.
+Las **comprobaciones** se hacen antes de crear el sucesor e incorporan la capacidad de la central y la restricción de los clientes garantizados.
 
-La capacitat es comprova amb
+La capacidad se comprueba con
 
 $$
-\text{ocupació actual}+\text{Mw necessaris per al client}
-\leq \text{producció de la central}.
+\text{ocupación actual}+\text{MW necesarios para el cliente}
+\leq \text{producción de la central}.
 $$
 
-**Respecte del codi**:
+**Respecto del código**:
 
-*Vegeu **Pipeline d'execució** per a més detalls sobre la implementació del codi.*
+*Véase @sec-pipeline para más detalles sobre la implementación del código.*
 
-`ConjuntoOperadores` no implementa les transformacions individualment, sinó que **defineix els conjunts d'operadors disponibles** (`MOVER`, `MOVER_ASIGNAR`, `MOVER_INTERCAMBIAR`, `MOVER_ASIGNAR_CENTRALES` i `COMPLETO`) i indica quins
-tipus de moviment inclou cada conjunt.
+`ConjuntoOperadores` no implementa las transformaciones individualmente, sino que **define los conjuntos de operadores disponibles** (`MOVER`, `MOVER_ASIGNAR`, `MOVER_INTERCAMBIAR`, `MOVER_ASIGNAR_CENTRALES` y `COMPLETO`) e indica qué
+tipos de movimiento incluye cada conjunto.
 
-Les classes `GeneradorSucesoresHC` i `GeneradorSucesoresSA` **utilitzen aquesta configuració per construir els successors**.
+Las clases `GeneradorSucesoresHC` y `GeneradorSucesoresSA` **utilizan esta configuración para construir los sucesores**.
 
-`GeneradorSucesoresHC`, per la seva part, enumera tots els successors legals dels operadors seleccionats i els entrega a Hill Climbing. Per tant, el nombre de successors depèn del conjunt triat i del valor de `k`.
+`GeneradorSucesoresHC`, por su parte, enumera todos los sucesores legales de los operadores seleccionados y los entrega a Hill Climbing. Por tanto, el número de sucesores depende del conjunto elegido y del valor de `k`.
 
-En canvi, `GeneradorSucesoresSA` escull aleatòriament un operador i els seus paràmetres i retorna un únic successor. Fa fins a 30 intents per trobar un moviment legal; si no en troba cap, retorna una còpia de l'estat actual.
+En cambio, `GeneradorSucesoresSA` elige aleatoriamente un operador y sus parámetros y devuelve un único sucesor. Hace hasta 30 intentos para encontrar un movimiento legal; si no encuentra ninguno, devuelve una copia del estado actual.
 
-Per tant, el mateix espai de solucions es recorre amb veïnats diferents segons l'algoritme: **complet per a Hill Climbing** i **mostrejat aleatòriament per a Simulated Annealing**.
+Así, el mismo espacio de soluciones se recorre con vecindarios distintos según el algoritmo: **completo para Hill Climbing** y **muestreado aleatoriamente para Simulated Annealing**.
 
-El paràmetre `k` limita aquest veïnatge a les `k` centrals més properes a
-cada client i als `k` clients més propers quan l'operador ho requereix. Amb
-`k` petit es redueix el nombre de successors, el temps d'avaluació i la
-memòria necessària; amb `k` gran s'exploren més alternatives, però el cost
-computacional augmenta. No es tracta d'un límit arbitrari sobre la capacitat:
-només restringeix quines parelles client-central es consideren en els
-moviments.
+El parámetro `k` limita este vecindario a las `k` centrales más cercanas a
+cada cliente y a los `k` clientes más cercanos cuando el operador lo requiere. Con
+`k` pequeño se reduce el número de sucesores, el tiempo de evaluación y la
+memoria necesaria; con `k` grande se exploran más alternativas, pero aumenta el coste
+computacional. No se trata de un límite arbitrario sobre la capacidad:
+solo restringe qué pares cliente-central se consideran en los
+movimientos.
 
-En l'escenari estudiat, les centrals llunyanes solen ser menys atractives
-perquè les pèrdues de transport consumeixen més capacitat. Per això es comparen
-diversos valors de `k` i es fixa un valor moderat quan l'ampliació del
-veïnatge ja no aporta una millora clara del benefici.
+En el escenario estudiado, las centrales lejanas suelen ser menos atractivas
+porque las pérdidas de transporte consumen más capacidad. Por eso se comparan
+varios valores de `k` y se fija uno moderado cuando ampliar el
+vecindario ya no aporta una mejora clara del beneficio.
 
-## Experiments
+## Experimentos {#sec-experimentos}
 
-En aquest projecte, **un experiment és una configuració concreta del problema que es repeteix sota una llavor determinada (valors inicials específics) i amb una mesura de qualitat ben definida**.
+En este proyecto, **un experimento es una configuración concreta del problema que se repite bajo una semilla determinada (valores iniciales específicos) y con una medida de calidad bien definida**.
 
-En termes pràctics, un experiment és el conjunt d'eleccions que fixen el problema: *nombre de clients, nombre i tipus de centrals, proporció de clients garantits, estratègia inicial, conjunt d'operadors, mida del veïnatge `k`, algoritme de cerca i paràmetres associats*.
+En términos prácticos, un experimento es el conjunto de elecciones que fijan el problema: *número de clientes, número y tipos de centrales, proporción de clientes garantizados, estrategia inicial, conjunto de operadores, tamaño del vecindario `k`, algoritmo de búsqueda y parámetros asociados*.
 
-Això és fonamental perquè el problema d'assignació energètica té una **estructura complexa** i no és suficient provar una sola solució.
+Esto es fundamental porque el problema de asignación energética tiene una **estructura compleja** y no basta probar una sola solución.
 
-La qualitat del resultat depèn de molts components simultanis: *la distribució geogràfica dels clients, la capacitat de les centrals, les pèrdues de transport, la capacitat de servir els clients garantits i el tipus de moviment que permet el veïnatge*.
+La calidad del resultado depende de muchos componentes simultáneos: *distribución geográfica de los clientes, capacidad de las centrales, pérdidas de transporte, capacidad para servir garantizados y tipo de movimiento permitido por el vecindario*.
 
-Per aquest motiu **el projecte està pensat per a una bateria d'experiments**.
+Por este motivo **el proyecto está pensado para una batería de experimentos**.
 
-Els **experiments permeten separar** quina part del rendiment depèn de la representació de l'estat, quina del veïnatge, quina de la funció heurística i quina de l'algoritme.
+Los **experimentos permiten separar** qué parte del rendimiento depende de la representación del estado, qué parte del vecindario, qué parte de la función heurística y qué parte del algoritmo.
 
-D'una banda, això fa possible **comparar solucions** sota les mateixes condicions; de l'altra, permet **detectar** si el problema està condicionat per una meseta, per la capacitat ociosa o per la necessitat de tancar centrals.
+Por un lado, esto hace posible **comparar soluciones** bajo las mismas condiciones; por otro, **detectar** si el problema queda atrapado en una meseta, limitado por capacidad ociosa o por la necesidad de cerrar centrales.
 
-Les **variacions principals** que es comparegen són:
+Las **variaciones principales** que se comparan son:
 
-- **solució inicial**: `ALEATORIA` i `VORAZ`;
-- **operadors**: moviments simples, assignació, intercanvi i obertura/tancament de centrals;
-- **veïnatge**: valor de `k` que limita els successors possibles;
-- **algoritme**: `Hill Climbing` i `Simulated Annealing`;
-- **heurística**: benefici pur, penalització de pèrdues i penalització de capacitat ociosa;
-- **escenari**: nombre de clients i centrals, i proporció de clients garantits.
+- **solución inicial**: `ALEATORIA` y `VORAZ`;
+- **operadores**: movimientos simples, asignación, intercambio y apertura/cierre de centrales;
+- **vecindario**: valor de `k` que limita los sucesores posibles;
+- **algoritmo**: `Hill Climbing` y `Simulated Annealing`;
+- **heurística**: beneficio puro, penalización de pérdidas y penalización de capacidad ociosa;
+- **escenario**: número de clientes y centrales, y proporción de garantizados.
 
-Cada configuració es prova amb **10 rèpliques**. Les rèpliques de totes les
-configuracions que es comparen utilitzen el mateix conjunt de llavors; per tant,
-en una rèplica concreta, els mètodes parteixen del mateix escenari i, quan
-correspon, de la mateixa solució inicial.
+Cada configuración se prueba con **10 réplicas**. Las réplicas de todas las
+configuraciones comparadas comparten el mismo conjunto de semillas; por tanto,
+en una réplica concreta, los métodos parten del mismo escenario y, cuando
+corresponde, de la misma solución inicial.
 
-Això permet fer comparacions emparellades i fa que les diferències observades s'atribueixin a la configuració avaluada i no a un escenari aleatori diferent.
+Esto permite comparaciones emparejadas y hace que las diferencias observadas se atribuyan a la configuración evaluada y no a un escenario aleatorio distinto.
 
-Per a les comparacions implementades a `Comparaciones` es compta, rèplica a
-rèplica, quantes vegades una configuració obté un benefici superior a l'altra.
+Para las comparaciones implementadas en `Comparaciones` se cuenta, réplica a
+réplica, cuántas veces una configuración obtiene un beneficio superior a la otra.
 
-Sota la hipòtesi nul·la que totes dues configuracions tenen la mateixa
-probabilitat de guanyar, el nombre de victòries segueix una distribució
+Bajo la hipótesis nula de que ambas configuraciones tienen la misma
+probabilidad de ganar, el número de victorias sigue una distribución
 binomial $B(n, 0{,}5)$.
 
-El contrast és bilateral i es considera significativa una diferència quan $p < 0{,}05$. Els empats no compten com una victòria i es descarten del nombre de rèpliques decisives del contrast.
+El contraste es bilateral y se considera significativa una diferencia cuando $p < 0{,}05$. Los empates no cuentan como victoria y se excluyen del número de réplicas decisivas.
 
-Aquest contrast s'utilitza per a les comparacions de benefici entre conjunts
-d'operadors, estratègies de solució inicial, heurístiques i algoritmes de cerca.
+Este contraste se utiliza en comparaciones de beneficio entre conjuntos
+de operadores, estrategias de solución inicial, heurísticas y algoritmos de búsqueda.
 
-Per a mètriques com el temps de còmput o els nodes expandits, el report mostra
-els valors resumits, però no s'hi aplica automàticament aquest contrast de
-victòries.
+Para métricas como tiempo de cómputo o nodos expandidos, el informe muestra
+valores resumidos, pero no aplica automáticamente este contraste de
+victorias.
 
-El **resultat de cada experiment** es resumeix amb mètriques com el benefici mitjà, la validesa de la solució, el temps de còmput, el nombre de nodes expandits i la qualitat del servei.
+El **resultado de cada experimento** se resume con métricas como beneficio medio, validez de la solución, tiempo de cómputo, nodos expandidos y calidad del servicio.
 
-En conjunt, **els experiments mostren que la decisió més determinant no és tant el cercador com el disseny dels operadors i la qualitat de la solució inicial**.
+En conjunto, **los experimentos muestran que la decisión más determinante no es tanto el algoritmo de búsqueda como el diseño de los operadores y la calidad de la solución inicial**.
 
-Després de l'anàlisi dels resultats, es conclou: *la combinació més equilibrada és la que reutilitza la inicial voraz, empra operadors compostos i limita el veïnatge a un valor moderat, perquè millora el benefici sense explotar excessivament el temps de càlcul*.
+Tras analizar los resultados, se concluye: *la combinación más equilibrada reutiliza la inicial voraz, emplea operadores compuestos y limita el vecindario a un valor moderado, porque mejora el beneficio sin disparar el tiempo de cálculo*.
 
-### Heurístiques
+### Heurísticas
 
 *FuncionHeuristica.java*
 
-La **funció heurística** és el criteri que utilitza l'algoritme de cerca local per comparar l'estat actual amb els seus successors.
+La **función heurística** es el criterio que utiliza el algoritmo de búsqueda local para comparar el estado actual con sus sucesores.
 
-En aquest problema no cal estimar la distància fins a un estat objectiu, perquè no hi ha un objectiu únic: qualsevol assignació vàlida pot ser una solució.
+En este problema no hace falta estimar la distancia a un estado objetivo, porque no hay un objetivo único: cualquier asignación válida puede ser una solución.
 
-Per tant, la heurística ha de prioritzar els estats que poden donar un benefici final més alt i, alhora, ha de guiar la cerca quan diversos estats tenen exactament el mateix benefici.
+Por tanto, la heurística debe priorizar estados con mayor beneficio final potencial y, además, guiar la búsqueda cuando varios estados tienen exactamente el mismo beneficio.
 
-El criteri principal és el **benefici real del problema**:
+El criterio principal es el **beneficio real del problema**:
 
 $$
 B(s) =
-\text{ingressos dels clients servits}
-- \text{cost de les centrals enceses}
-- \text{indemnitzacions dels clients no garantits no servits}.
+\text{ingresos de los clientes servidos}
+- \text{coste de las centrales encendidas}
+- \text{indemnizaciones de clientes no garantizados no servidos}.
 $$
 
-Les **restriccions de capacitat i d'assignació** s'apliquen en generar els successors, de manera que no cal afegir-les com a penalitzacions a la funció
-heurística en el funcionament normal.
+Las **restricciones de capacidad y asignación** se aplican al generar sucesores, de modo que no hace falta añadirlas como penalizaciones a la función
+heurística en el funcionamiento normal.
 
-Els clients garantits tampoc no es poden desassignar després de la construcció de l'estat inicial. Això permet que la funció se centri en ordenar els estats factibles segons la seva qualitat.
+Los clientes garantizados tampoco pueden desasignarse después de construir el estado inicial. Así, la función puede centrarse en ordenar estados factibles según su calidad.
 
-El projecte implementa tres variants:
+El proyecto implementa tres variantes:
 
-| Heurística | Expressió del criteri de qualitat | Funció |
+| Heurística | Expresión del criterio de calidad | Función |
 |---|---|---|
-| **H1: benefici** | $B(s)$ | Optimitza directament l'objectiu del problema. |
-| **H2: penalització de pèrdues** | $B(s) - w \cdot Mw_{\text{perduts}}(s)$ | Prefereix assignacions que necessiten produir menys energia perduda en el transport. |
-| **H3: penalització de capacitat ociosa** | $B(s) - w \cdot Mw_{\text{ociosos}}(s)$ | Prefereix concentrar la demanda en centrals enceses i amb menys capacitat sense utilitzar. |
+| **H1: beneficio** | $B(s)$ | Optimiza directamente el objetivo del problema. |
+| **H2: penalización de pérdidas** | $B(s) - w \cdot Mw_{\text{perdidos}}(s)$ | Prefiere asignaciones que requieren producir menos energía perdida en transporte. |
+| **H3: penalización de capacidad ociosa** | $B(s) - w \cdot Mw_{\text{ociosos}}(s)$ | Prefiere concentrar la demanda en centrales encendidas con menos capacidad sin usar. |
 
-En **H2**, les pèrdues no són un cost monetari directe: són megawatts addicionals que cal produir i, per tant, redueixen la capacitat disponible.
+En **H2**, las pérdidas no son un coste monetario directo: son megavatios adicionales que hay que producir y, por tanto, reducen la capacidad disponible.
 
-La penalització de les pèrdues permet donar una puntuació més precisa als estats, especialment en situacions on la distància entre clients i centrals és important.
+Penalizar las pérdidas permite puntuar los estados con más detalle, sobre todo cuando la distancia cliente-central importa.
 
-Penalitzar-les proporciona, però, un criteri de desempat útil quan un moviment
-canvia la distància d'un client sense encendre ni apagar cap central.
+Esa penalización aporta un criterio de desempate útil cuando un movimiento
+cambia la distancia de un cliente sin encender ni apagar ninguna central.
 
-En **H3**, la capacitat ociosa és la producció disponible de les centrals enceses que no s'està utilitzant.
+En **H3**, la capacidad ociosa es la producción disponible de centrales encendidas que no se está utilizando.
 
-La penalització afavoreix solucions més compactes i pot facilitar que una central quedi buida i es pugui apagar en moviments posteriors.
+La penalización favorece soluciones más compactas y puede facilitar vaciar una central y apagarla en movimientos posteriores.
 
-Tant H2 com H3 són criteris secundaris: el benefici que es reporta als experiments és sempre el benefici real $B(s)$, no el valor penalitzat de la
+Tanto H2 como H3 son criterios secundarios: el beneficio reportado en los experimentos es siempre el beneficio real $B(s)$, no el valor penalizado de la
 heurística.
 
-El paràmetre $w$ expressa el pes del criteri secundari en euros equivalents
-per megawatt. A l'experiment 7 es proven els pesos $1$, $10$, $50$ i $200$ €/MW, tant amb operadors simples (`MOVER_ASIGNAR`) com amb operadors compostos (`MOVER_ASIGNAR_CENTRALES`).
+El parámetro $w$ expresa el peso del criterio secundario en euros equivalentes
+por megavatio. En el experimento 7 se prueban pesos $1$, $10$, $50$ y $200$ €/MW, con operadores simples (`MOVER_ASIGNAR`) y compuestos (`MOVER_ASIGNAR_CENTRALES`).
 
-El pes té unitats d'euros per megawatt i permet interpretar el terme secundari
-en la mateixa escala que el benefici. Ha de ser prou gran per distingir estats
-amb el mateix benefici, però prou petit per no invertir l'ordre entre dos
-estats amb beneficis reals diferents. Amb un pes massa alt, la cerca pot
-prioritzar reduir pèrdues o capacitat ociosa encara que això empitjori el
-benefici real; per això l'experiment 7 prova un rang de pesos i les
-configuracions sempre es comparen amb el benefici real final.
+$w$ tiene unidades de euros por megavatio y permite interpretar el término secundario
+en la misma escala que el beneficio. Debe ser lo bastante grande para distinguir estados
+con el mismo beneficio, pero lo bastante pequeño para no invertir el orden entre dos
+estados con beneficios reales distintos. Con un peso demasiado alto, la búsqueda puede
+priorizar reducir pérdidas u ociosidad aunque empeore el
+beneficio real; por eso el experimento 7 barre varios pesos y las
+configuraciones siempre se comparan con el beneficio real final.
 
-Les **heurístiques secundàries** són especialment importants amb operadors simples.
+Las **heurísticas secundarias** son especialmente útiles con operadores simples.
 
-El benefici és constant quan es mou un client entre dues centrals que ja estan
-enceses, i Hill Climbing interpreta aquests moviments com una meseta. H2 pot
-trencar-la perquè les pèrdues depenen de la distància, mentre que H3 pot
-afavorir una redistribució que permeti tancar una central.
+El beneficio es constante al mover un cliente entre dos centrales ya
+encendidas, y Hill Climbing interpreta esos movimientos como meseta. H2 puede
+romperla porque las pérdidas dependen de la distancia, mientras que H3 puede
+favorecer una redistribución que permita cerrar una central.
 
-Amb operadors compostos, un únic moviment pot fer explícit el canvi d'obrir o tancar centrals; en aquest cas H1 acostuma a ser suficient i les variants serveixen sobretot per analitzar el comportament de la cerca.
+Con operadores compuestos, un solo movimiento puede abrir o cerrar centrales explícitamente; en ese caso H1 suele bastar y las variantes sirven sobre todo para analizar el comportamiento de la búsqueda.
 
-Finalment, AIMA espera una funció que s'ha de **minimitzar**, mentre que el
-problema es formula com una maximització. Per això `FuncionHeuristica` calcula primer el criteri anterior i retorna el seu negatiu.
+Finalmente, AIMA espera una función que hay que **minimizar**, mientras que el
+problema se formula como maximización. Por eso `FuncionHeuristica` calcula primero el criterio anterior y devuelve su negativo.
 
-La qualitat que apareix als CSV i a les figures, en canvi, és sempre el benefici real de l'estat final.
+La calidad que aparece en los CSV y en las figuras es siempre el beneficio real del estado final.
 
-Com que l'estat manté incrementalment el benefici, les pèrdues i la capacitat ociosa, l'avaluació de qualsevol de les tres variants es fa en temps constant $O(1)$.
+Como el estado mantiene de forma incremental beneficio, pérdidas y capacidad ociosa, evaluar cualquiera de las tres variantes cuesta tiempo constante $O(1)$.
 
-## Pipeline d'execució
+## Pipeline de ejecución {#sec-pipeline}
 
-Abans d'analitzar els algorismes i els resultats, és útil veure **com s'encadenen els components del projecte durant una execució**.
+Antes de analizar algoritmos y resultados, conviene ver **cómo se encadenan los componentes del proyecto durante una ejecución**.
 
-La bateria d'experiments no implementa directament la cerca: prepara les dades, crea l'estat inicial i delega la cerca a les classes d'AIMA.
+La batería de experimentos no implementa la búsqueda directamente: prepara los datos, crea el estado inicial y delega la búsqueda en las clases de AIMA.
 
-El **flux general** és:
+El **flujo general** es:
 
 **MainExperimentos.java**
-  ├─ inicialitza l'escenari
-  ├─ crea l'estat inicial
-  └─ crida **Ejecucion.java**
-       ├─ crea el generador de successors
-       ├─ crea el problema de cerca amb **Problem** (AIMA)
-       ├─ crea l'agent amb **SearchAgent** (AIMA)
+  ├─ inicializa el escenario
+  ├─ crea el estado inicial
+  └─ llama a **Ejecucion.java**
+       ├─ crea el generador de sucesores
+       ├─ crea el problema de búsqueda con **Problem** (AIMA)
+       ├─ crea el agente con **SearchAgent** (AIMA)
        ├─ crea **HillClimbingSearch** o **SimulatedAnnealingSearch** (AIMA)
-       └─ executa **HillClimbingSearch** o **SimulatedAnnealingSearch**
-            ├─ demana successors a **GeneradorSucesoresHC.java** o **GeneradorSucesoresSA.java**
-            │    └─ aplica operadors sobre còpies de **EstadoEnergia.java**
-            ├─ avalua els estats amb **FuncionHeuristica.java**
-            └─ comprova el criteri de finalització amb **EstadoFinal.java**
-       └─ recull el resultat i l'escriu a **results/expN.csv**
+       └─ ejecuta **HillClimbingSearch** o **SimulatedAnnealingSearch**
+            ├─ pide sucesores a **GeneradorSucesoresHC.java** o **GeneradorSucesoresSA.java**
+            │    └─ aplica operadores sobre copias de **EstadoEnergia.java**
+            ├─ evalúa estados con **FuncionHeuristica.java**
+            └─ comprueba el criterio de parada con **EstadoFinal.java**
+       └─ recoge el resultado y lo escribe en **results/expN.csv**
 
-### Entrada i preparació de l'experiment
+### Entrada y preparación del experimento
 
-L'execució comença en el mètode `main` de `MainExperimentos`.
+La ejecución comienza en el método `main` de `MainExperimentos`.
 
-L'argument de la línia d'ordres **selecciona un experiment concret** (`1` a `8`), tots els experiments (`todos`) o una comprovació ràpida (`smoke`).
+El argumento de línea de comandos **selecciona un experimento** (`1` a `8`), todos los experimentos (`todos`) o una comprobación rápida (`smoke`).
 
-Abans d'executar cada rèplica, `MainExperimentos` **fixa la configuració de l'escenari base**: nombre i tipus de centrals, nombre de clients, proporció de clients garantits i mida del veïnatge `k`.
+Antes de cada réplica, `MainExperimentos` **fija la configuración del escenario base**: número y tipos de centrales, número de clientes, proporción de garantizados y tamaño del vecindario `k`.
 
-La funció `escenarioBase` delega la inicialització a `EstadoEnergia.inicializaEscenario`.
+La función `escenarioBase` delega la inicialización en `EstadoEnergia.inicializaEscenario`.
 
-Aquesta crida carrega les centrals i els clients des de la biblioteca del problema, calcula les dades que es mantindran constants durant la cerca i precalcula les distàncies, les pèrdues i els megawatts necessaris per a cada assignació client-central.
+Esa llamada carga centrales y clientes desde la biblioteca del problema, calcula los datos que permanecen constantes durante la búsqueda y precalcula distancias, pérdidas y megavatios necesarios por par cliente-central.
 
-**La llavor de la rèplica** s'utilitza per fer reproduïbles tant l'escenari com les decisions aleatòries.
+**La semilla de la réplica** sirve para hacer reproducibles el escenario y las decisiones aleatorias.
 
-Després es crea l'estat inicial, per exemple amb l'estratègia `VORAZ`:
+Después se crea el estado inicial, por ejemplo con la estrategia `VORAZ`:
 
 ```java
 EstadoEnergia inicial = new EstadoEnergia(
         EstadoEnergia.EstrategiaInicial.VORAZ, semilla);
 ```
 
-Aquest objecte **conté l'assignació inicial i totes les magnituds incrementals que necessitaran els operadors i les heurístiques**.
+Este objeto **contiene la asignación inicial y todas las magnitudes incrementales que necesitarán operadores y heurísticas**.
 
-### Muntatge de la cerca
+### Montaje de la búsqueda
 
-La classe `Ejecucion` centralitza la diferència entre els dos algorismes.
+La clase `Ejecucion` concentra la diferencia entre los dos algoritmos.
 
-En una execució de Hill Climbing crea un `HillClimbingSearch` i un
+En Hill Climbing crea un `HillClimbingSearch` y un
 `GeneradorSucesoresHC`.
 
-En una execució de Simulated Annealing crea un `SimulatedAnnealingSearch`, amb els paràmetres de temperatura i iteracions, i un `GeneradorSucesoresSA`, inicialitzat amb la llavor corresponent.
+En Simulated Annealing crea un `SimulatedAnnealingSearch`, con parámetros de temperatura e iteraciones, y un `GeneradorSucesoresSA` inicializado con la semilla correspondiente.
 
-Tot seguit, `Ejecucion` **construeix el problema d'AIMA**:
+A continuación, `Ejecucion` **construye el problema de AIMA**:
 
 ```java
 Problem problema = new Problem(
         inicial, sucesores, new EstadoFinal(), heuristica);
 ```
 
-Aquest objecte **agrupa els quatre elements que necessita la infraestructura de cerca**:
+Este objeto **agrupa los cuatro elementos que necesita la infraestructura de búsqueda**:
 
-- L'estat inicial;
-- La funció de successors, que defineix el veïnatge;
-- El test de finalització;
-- La funció heurística que permet comparar estats.
+- El estado inicial;
+- La función de sucesores, que define el vecindario;
+- El test de parada;
+- La función heurística para comparar estados.
 
-En aquest problema `EstadoFinal` retorna sempre `false`, perquè **no es busca un estat objectiu concret**.
+En este problema `EstadoFinal` devuelve siempre `false`, porque **no se busca un estado objetivo concreto**.
 
-Hill Climbing acaba **quan no troba cap successor estrictament millor**, mentre que Simulated Annealing acaba **quan consumeix el nombre d'iteracions configurat**.
+Hill Climbing termina **cuando no encuentra un sucesor estrictamente mejor**, mientras que Simulated Annealing termina **cuando agota las iteraciones configuradas**.
 
-### Expansió i avaluació dels estats
+### Expansión y evaluación de los estados
 
-`Ejecucion` entrega el `Problem` i l'algorisme a `SearchAgent`, que forma part
+`Ejecucion` entrega el `Problem` y el algoritmo a `SearchAgent`, que forma parte
 de `AIMA.jar`.
 
-AIMA controla el bucle de cerca i, en cada expansió, demana successors a la funció corresponent.
+AIMA controla el bucle de búsqueda y, en cada expansión, pide sucesores a la función correspondiente.
 
-`GeneradorSucesoresHC` recorre tots els clients, centrals i operadors seleccionats en `ConjuntoOperadores`. Per cada moviment legal crea una còpia d'`EstadoEnergia`, aplica l'operador i incorpora el successor a la llista.
+`GeneradorSucesoresHC` recorre clientes, centrales y operadores seleccionados en `ConjuntoOperadores`. Por cada movimiento legal crea una copia de `EstadoEnergia`, aplica el operador e incorpora el sucesor a la lista.
 
-Hill Climbing avalua tota aquesta llista i escull el millor successor segons la heurística.
+Hill Climbing evalúa toda esa lista y elige el mejor sucesor según la heurística.
 
-`GeneradorSucesoresSA` no materialitza tot el veïnatge. Escull aleatòriament un
-operador i els seus paràmetres, prova fins a 30 combinacions i retorna el primer successor legal.
+`GeneradorSucesoresSA` no materializa todo el vecindario. Elige aleatoriamente un
+operador y sus parámetros, prueba hasta 30 combinaciones y devuelve el primer sucesor legal.
 
-Si no en troba cap, retorna una còpia de l'estat actual perquè el bucle de Simulated Annealing pugui continuar.
+Si no encuentra ninguno, devuelve una copia del estado actual para que el bucle de Simulated Annealing pueda continuar.
 
-En tots dos casos, la lògica concreta de les transformacions és a `EstadoEnergia`: comprova la capacitat, manté la restricció dels clients garantits i actualitza incrementalment el benefici, l'ocupació i les magnituds energètiques.
+En ambos casos, la lógica concreta de las transformaciones está en `EstadoEnergia`: comprueba capacidad, mantiene la restricción de garantizados y actualiza de forma incremental beneficio, ocupación y magnitudes energéticas.
 
-`FuncionHeuristica` llegeix aquestes magnituds per calcular el benefici pur o les variants que penalitzen les pèrdues i la capacitat ociosa.
+`FuncionHeuristica` lee esas magnitudes para calcular el beneficio puro o las variantes que penalizan pérdidas y capacidad ociosa.
 
-### Biblioteques i sortida
+### Bibliotecas y salida
 
-El motor genèric de cerca prové d'`AIMA.jar`.
+El motor genérico de búsqueda proviene de `AIMA.jar`.
 
-Les interfícies `Problem`, `SearchAgent`, `SuccessorFunction`, `GoalTest` i `HeuristicFunction`, així com les implementacions `HillClimbingSearch` i `SimulatedAnnealingSearch`, són proporcionades per aquesta biblioteca.
+Las interfaces `Problem`, `SearchAgent`, `SuccessorFunction`, `GoalTest` y `HeuristicFunction`, así como las implementaciones `HillClimbingSearch` y `SimulatedAnnealingSearch`, las proporciona esa biblioteca.
 
-Les dades físiques del problema provenen de `CentralEnergia.jar`, que aporta les classes `Central`, `Centrales`, `Cliente`, `Clientes` i `VEnergia`. El codi de la pràctica les utilitza per construir l'escenari i obtenir costos, consums i pèrdues de transport.
+Los datos físicos del problema vienen de `CentralEnergia.jar`, que aporta las clases `Central`, `Centrales`, `Cliente`, `Clientes` y `VEnergia`. El código de la práctica las usa para construir el escenario y obtener costes, consumos y pérdidas de transporte.
 
-Quan AIMA finalitza la cerca, `Ejecucion` recupera l'estat final i construeix un objecte `Ejecucion.Resultado` amb el benefici, el temps, els nodes expandits, la validesa, els clients servits, les centrals enceses i les magnituds energètiques. `MainExperimentos` agrega aquests resultats, mostra els resums per terminal i els desa a `results/expN.csv`.
+Cuando AIMA termina la búsqueda, `Ejecucion` recupera el estado final y construye un `Ejecucion.Resultado` con beneficio, tiempo, nodos expandidos, validez, clientes servidos, centrales encendidas y magnitudes energéticas. `MainExperimentos` agrega esos resultados, muestra resúmenes en terminal y los guarda en `results/expN.csv`.
 
-Posteriorment, `Graficas` utilitza aquests CSV per generar les figures i `Comparaciones` calcula les comparacions estadístiques.
+Después, `Graficas` usa esos CSV para generar figuras y `Comparaciones` calcula las comparaciones estadísticas.
 
 
 
@@ -677,390 +686,209 @@ Posteriorment, `Graficas` utilitza aquests CSV per generar les figures i `Compar
 
 
 
-## Resultats experimentals
 
-Aquest apartat presenta els resultats de la bateria d'experiments descrita a
-**Experiments**. Cada configuració s'executa amb 10 rèpliques i les configuracions
-que es comparen comparteixen les mateixes llavors. Les figures es generen a
-partir dels fitxers CSV de `results/`, i les comparacions de benefici es fan
-rèplica a rèplica.
 
-Les mètriques principals són el **benefici final**, el **temps de còmput**, el
-nombre de **nodes expandits**, el nombre de **centrals enceses** i els
-**clients servits**. En els experiments on és rellevant també s'analitzen les
-pèrdues de transport, la capacitat ociosa i la validesa de la solució. Els
-valors agregats es presenten com a mitjana i desviació típica sobre les
-rèpliques.
+## Resultados experimentales
 
-### Operadors i mida del veïnatge
+Este apartado presenta los resultados de la batería de experimentos descrita en @sec-experimentos. Cada configuración se ejecuta con 10 réplicas y las configuraciones comparadas comparten las mismas semillas. Las figuras se generan a partir de los CSV en `results/`; las comparaciones de beneficio son pareadas, réplica a réplica.
 
-L'experiment 1 estudia l'efecte del conjunt d'operadors amb Hill Climbing,
-solució inicial `VORAZ` i l'escenari base. Amb només `MOVER`,
-`MOVER_ASIGNAR` o `MOVER_INTERCAMBIAR`, el benefici mitjà és el mateix:
-aproximadament 1.207.656 €. En canvi, `MOVER_ASIGNAR_CENTRALES`, que incorpora
-moviments d'obertura i tancament de centrals, arriba aproximadament a
-1.358.883 €.
+Las métricas principales son el **beneficio final**, el **tiempo de cómputo**, los **nodos expandidos**, las **centrales encendidas** y los **clientes servidos**. Cuando procede también se analizan pérdidas de transporte, capacidad ociosa y validez. Los valores agregados son media y desviación típica sobre las réplicas.
 
-La comparació rèplica a rèplica entre `MOVER_ASIGNAR_CENTRALES` i
-`MOVER_ASIGNAR` dona 10 victòries de 10 i $p = 0{,}002$. El conjunt
-`COMPLETO` obté el mateix benefici mitjà que els operadors compostos, però
-amb més temps de còmput. Per tant, els operadors que permeten modificar
-directament l'estat de les centrals són els que produeixen el canvi més gran
-en el benefici observat.
+### Operadores y tamaño del vecindario
 
-![Benefici segons el conjunt d'operadors.](../results/fig1a-operadores.png){width=88%}
+**Expectativa:** Los operadores que abren o cierran centrales deberían elevar el beneficio respecto a movimientos que solo reasignan clientes; ampliar demasiado el vecindario (`k`) aumentará el coste sin ganancias proporcionales.
 
-Amb el conjunt d'operadors compostos, el benefici és similar per als valors
-de $k$ provats. El temps i el nombre de successors, però, augmenten quan el
-veïnatge és més gran. El valor $k = 8$ ofereix un compromís entre qualitat i
-cost de còmput en l'escenari base.
+**Resultado:** Con Hill Climbing, inicialización `VORAZ` y escenario base, `MOVER`, `MOVER_ASIGNAR` y `MOVER_INTERCAMBIAR` dan un beneficio medio similar (~1.207.656 €). `MOVER_ASIGNAR_CENTRALES` alcanza ~1.358.883 €; frente a `MOVER_ASIGNAR` gana 10/10 réplicas ($p = 0{,}002$). `COMPLETO` iguala el beneficio de los compuestos con más tiempo. Con operadores compuestos, el beneficio es estable en los `k` probados; $k = 8$ equilibra calidad y cómputo.
 
-![Efecte de la mida del veïnatge.](../results/fig1b-vecindario.png){width=88%}
+![Beneficio según el conjunto de operadores.](../results/fig1a-operadores.png){width=88%}
 
-### Estratègia de solució inicial
+![Efecto del tamaño del vecindario.](../results/fig1b-vecindario.png){width=88%}
 
-L'experiment 2 compara les inicialitzacions `ALEATORIA` i `VORAZ` mantenint
-fixos els operadors seleccionats a l'experiment anterior. La solució voraç
-parteix d'un benefici inicial molt superior i també acaba amb un benefici
-final més alt: aproximadament 1.358.883 € davant d'1.282.558 € de la
-inicialització aleatòria.
+### Estrategia de solución inicial
 
-La solució `VORAZ` guanya en les 10 rèpliques, amb una diferència mitjana
-aproximada de 76.325 € i $p = 0{,}002$. La millora respecte de la solució
-inicial també és diferent: la inicialització aleatòria permet més recorregut
-durant la cerca, però no compensa la qualitat del punt de partida voraç.
+**Expectativa:** La inicialización voraz debería partir de más centrales reutilizadas y acabar con mejor beneficio que una semilla aleatoria, aunque deje menos margen de mejora local.
 
-![Benefici de les solucions inicials.](../results/fig2a-inicial-beneficio.png){width=88%}
+**Resultado:** `VORAZ` supera a `ALEATORIA` en las 10 réplicas (~1.358.883 € frente a ~1.282.558 €; ~76.325 € de diferencia media, $p = 0{,}002$). La aleatoria permite más pasos de mejora, pero no compensa el peor punto de partida.
 
-![Millora obtinguda a partir de cada solució inicial.](../results/fig2b-inicial-mejora.png){width=88%}
+![Beneficio de las soluciones iniciales.](../results/fig2a-inicial-beneficio.png){width=88%}
 
-### Paràmetres de Simulated Annealing
+![Mejora obtenida a partir de cada solución inicial.](../results/fig2b-inicial-mejora.png){width=88%}
 
-L'experiment 3 estudia la mida del veïnatge i el paràmetre de refredament de
-Simulated Annealing, i posteriorment compara diferents nombres d'iteracions.
-Els valors de $\lambda$ petits mantenen una temperatura efectiva durant més
-temps i comporten més temps de còmput. En el barrido inicial, les diferències
-de benefici són petites en relació amb la variabilitat entre rèpliques.
+### Parámetros de Simulated Annealing
 
-Per als experiments posteriors es fixa una configuració de 100.000 iteracions,
-1.000 iteracions per temperatura, $k = 5$ i $\lambda = 0{,}01$. Aquesta
-configuració no es tria només pel màxim benefici puntual del barrido, sinó
-perquè ofereix una qualitat similar a valors més lents amb un cost temporal
-menor.
+**Expectativa:** Temperaturas más altas o más iteraciones exploran más pero encarecen la ejecución; conviene fijar parámetros razonables antes de comparar con Hill Climbing.
 
-![Benefici segons la temperatura i el veïnatge.](../results/fig3a-temperatura-beneficio.png){width=88%}
+**Resultado:** En el barrido inicial, $\lambda$ pequeños mantienen temperatura efectiva más tiempo (más cómputo) con diferencias de beneficio modestas. Se fijan 100.000 iteraciones, 1.000 por temperatura, $k = 5$ y $\lambda = 0{,}01$ por equilibrio calidad/tiempo, no solo por un máximo puntual.
 
-![Temps de còmput segons la temperatura i el veïnatge.](../results/fig3b-temperatura-tiempo.png){width=88%}
+![Beneficio según la temperatura y el vecindario.](../results/fig3a-temperatura-beneficio.png){width=88%}
 
-![Efecte del nombre d'iteracions.](../results/fig3c-iteraciones.png){width=88%}
+![Tiempo de cómputo según la temperatura y el vecindario.](../results/fig3b-temperatura-tiempo.png){width=88%}
 
-### Escalabilitat amb el nombre de clients i centrals
+![Efecto del número de iteraciones.](../results/fig3c-iteraciones.png){width=88%}
 
-L'experiment 4 mesura com varia el temps de còmput quan augmenta el nombre
-de clients o el nombre de centrals. Amb el nombre de centrals fix, el temps
-creix aproximadament amb el nombre de clients, perquè els operadors han de
-considerar més assignacions possibles. Quan augmenta el nombre de centrals,
-també augmenta el nombre d'alternatives que s'han de comprovar.
+### Escalabilidad con el número de clientes y centrales
 
-Aquest experiment mostra que el cost computacional depèn tant de la mida de
-l'assignació com de la mida del veïnatge. Per això el benefici no és l'única
-mètrica necessària per valorar una configuració.
+**Expectativa:** El tiempo debería crecer al aumentar clientes o centrales porque hay más movimientos que evaluar.
 
-![Temps segons el nombre de clients.](../results/fig4a-escalado-clientes.png){width=88%}
+**Resultado:** Con centrales fijas, el tiempo crece con el número de clientes; al aumentar centrales, también crecen las alternativas. El coste depende del tamaño de la asignación y del vecindario, no solo del beneficio.
 
-![Temps segons el nombre de centrals.](../results/fig4b-escalado-centrales.png){width=88%}
+![Tiempo según el número de clientes.](../results/fig4a-escalado-clientes.png){width=88%}
 
-### Penalització dels clients garantits no servits
+![Tiempo según el número de centrales.](../results/fig4b-escalado-centrales.png){width=88%}
 
-L'experiment 5 estudia el tractament de la restricció dels clients garantits.
-En lloc d'impedir sempre que quedin sense servir, la configuració experimental
-permet aquests estats i n'incorpora una penalització a la funció de qualitat.
-Això serveix per observar l'efecte de convertir una restricció dura en una
-penalització, però no substitueix la configuració normal del problema, en què
-els clients garantits s'han de servir.
+### Penalización de los clientes garantizados no servidos
 
-Els resultats permeten comparar el benefici amb el nombre de clients garantits
-no servits i comprovar si la penalització és prou gran per evitar solucions
-invàlides. La validesa s'ha d'interpretar sempre separadament del benefici:
-una solució amb més benefici però que incompleix el servei garantit no és
-equivalent a una solució factible.
+**Expectativa:** Penalizar clientes garantizados no servidos permite estudiar la restricción como coste blando; umbrales altos deberían recuperar soluciones válidas.
 
-![Efecte de la penalització dels clients garantits.](../results/fig5-penalizacion.png){width=88%}
+**Resultado:** En modo penalización, Hill Climbing con **100 €/MWh** deja **10/10** réplicas válidas; Simulated Annealing necesita alrededor de **500 €/MWh** para el mismo efecto. La validez debe interpretarse aparte del beneficio: más beneficio con garantizados incumplidos no equivale a una solución factible en el modo normal.
 
-### Ampliació del parc de centrals
+![Efecto de la penalización de los clientes garantizados.](../results/fig5-penalizacion.png){width=88%}
 
-L'experiment 6 varia el nombre de centrals de tipus C mantenint la demanda
-fixa. Afegir centrals no implica necessàriament obtenir un benefici més alt:
-una central només aporta capacitat quan és útil, però té un cost quan queda
-encesa. Per tant, el nombre de centrals disponibles i el nombre de centrals
-que finalment s'activen són magnituds diferents.
+### Ampliación del parque de centrales
 
-La figura mostra com canvien les centrals enceses i el benefici quan es duplica
-o triplica el parc de centrals de tipus C.
+**Expectativa:** Más centrales tipo C no implica necesariamente más beneficio: centrales encendidas sin uso elevan costes.
 
-![Centrals enceses en ampliar el parc de centrals de tipus C.](../results/fig6-tipos-centrales.png){width=88%}
+**Resultado:** Al pasar de 25 a 50 y 75 centrales de tipo C, el uso medio de **C** sube (~21,5 → ~34,7 en HC), **A** y **B** bajan ligeramente (~5,0 → ~4,5 y ~9,8 → ~9,2), el **beneficio** cae (~1,36 M€ → ~1,15 M€) y Simulated Annealing es **~20–25 veces más lento** que Hill Climbing (p. ej. ~311 ms frente a ~12 ms con 25 centrales C).
 
-### Comparació de les heurístiques
+![Centrales encendidas al ampliar el parque de centrales tipo C.](../results/fig6-tipos-centrales.png){width=88%}
 
-L'experiment 7 compara H1, H2 i H3 amb els operadors simples i compostos.
-Amb operadors simples, H2 pot distingir moviments que tenen el mateix benefici
-però generen pèrdues de transport diferents. H3 introdueix un criteri
-relacionat amb la capacitat ociosa i pot afavorir moviments que preparen el
-tancament d'una central.
+### Comparación de las heurísticas
 
-Amb pes intermedi ($w = 10$), H3 guanya a H1 en les 10 rèpliques quan s'utilitzen
-operadors simples ($p = 0{,}002$). En canvi, la diferència entre H2 i H1 no és
-significativa ($p = 0{,}0625$). Amb operadors compostos, les diferències entre
-les heurístiques no són significatives en les comparacions disponibles.
+**Expectativa:** H2 y H3 deberían desempatar mesetas con operadores simples; con compuestos, H1 bastará.
 
-Aquest patró és coherent amb el fet que els operadors compostos ja poden
-expressar directament els canvis d'obrir i tancar centrals. Les figures també
-permeten veure com el pes del criteri secundari afecta el benefici real i el
-nombre de passos de Hill Climbing.
+**Resultado:** Con `MOVER_ASIGNAR`, H3 ($w = 10$) gana a H1 en 10/10 réplicas ($p = 0{,}002$); H2 vs H1 no es significativo ($p = 0{,}0625$). Con operadores compuestos las diferencias entre heurísticas no son significativas. Las figuras muestran el efecto del peso secundario sobre beneficio real y pasos de Hill Climbing.
 
-![Benefici real segons la funció heurística.](../results/fig7a-heuristicas.png){width=88%}
+![Beneficio real según la función heurística.](../results/fig7a-heuristicas.png){width=88%}
 
-![Efecte del pes amb operadors simples.](../results/fig7b-pesos-simples.png){width=88%}
+![Efecto del peso con operadores simples.](../results/fig7b-pesos-simples.png){width=88%}
 
-![Efecte del pes amb operadors compostos.](../results/fig7c-pesos-compuestos.png){width=88%}
+![Efecto del peso con operadores compuestos.](../results/fig7c-pesos-compuestos.png){width=88%}
 
-![Passos de Hill Climbing segons la heurística.](../results/fig7d-heuristicas-pasos.png){width=88%}
+![Pasos de Hill Climbing según la heurística.](../results/fig7d-heuristicas-pasos.png){width=88%}
 
-### Hill Climbing i Simulated Annealing
+### Hill Climbing y Simulated Annealing
 
-L'experiment 8 compara els dos algoritmes amb operadors simples i compostos.
-Amb `MOVER_ASIGNAR`, Simulated Annealing guanya a Hill Climbing en les 10
-rèpliques, amb una diferència mitjana d'aproximadament 97.411 € i
-$p = 0{,}002$. Això és compatible amb la capacitat de Simulated Annealing de
-recórrer moviments laterals o acceptar temporalment moviments que no milloren
-el benefici.
+**Expectativa:** Simulated Annealing debería ayudar con mesetas de operadores simples; con compuestos, Hill Climbing debería ser más rápido con beneficio similar.
 
-Amb `MOVER_ASIGNAR_CENTRALES`, Simulated Annealing només guanya en 3 de les
-10 rèpliques i la diferència no és significativa ($p = 0{,}3438$). En aquest
-cas els dos algoritmes obtenen beneficis similars, però Hill Climbing necessita
-menys temps de còmput.
+**Resultado:** Con `MOVER_ASIGNAR`, SA gana 10/10 réplicas (~97.411 € de media, $p = 0{,}002$). Con `MOVER_ASIGNAR_CENTRALES`, SA solo gana 3/10 ($p = 0{,}3438$); ambos alcanzan beneficio similar y HC usa menos tiempo.
 
-![Comparació entre Hill Climbing i Simulated Annealing.](../results/fig8-hc-vs-sa.png){width=88%}
+![Comparación entre Hill Climbing y Simulated Annealing.](../results/fig8-hc-vs-sa.png){width=88%}
 
-## Execució i reproducció
+## Ejecución y reproducción
 
-Aquest apartat descriu el procediment complet per repetir la compilació, les
-proves, els experiments i la generació dels resultats del report.
+Este apartado describe el procedimiento para repetir compilación, pruebas, experimentos y generación del informe.
 
-### Requisits i directori de treball
+### Requisitos y directorio de trabajo
 
-Cal disposar de:
+Se necesita:
 
 - **JDK 26 o superior**;
-- les biblioteques `CentralEnergia.jar`, `AIMA.jar` i les dependències de
-  `lib/lib/`;
-- **Quarto** i una instal·lació de LaTeX (en cas de voler generar de nou el PDF).
+- las bibliotecas `CentralEnergia.jar`, `AIMA.jar` y dependencias en `lib/lib/`;
+- **Quarto** y LaTeX si se quiere regenerar el PDF.
 
-Totes les ordres següents s'executen des de l'**arrel del repositori**. Els
-fitxers CSV i les figures es desen a `results/`, mentre que les classes compilades es desen a `out/`.
+Todas las órdenes se ejecutan desde la **raíz del repositorio**. Los CSV y figuras van a `results/`; las clases compiladas, a `out/`.
 
-### Compilació
-
-Per compilar el codi propi i deixar les classes compilades a `out/`:
+### Compilación
 
 ```powershell
 javac -cp "lib\CentralEnergia.jar;lib\AIMA.jar;lib\lib\*" `
-  -d out (Get-ChildItem -Recurse src -Filter *.java | % FullName)
+  -d out (Get-ChildItem -Recurse src -Filter *.java | Where-Object { $_.Name -ne 'Prueba0.java' } | % FullName)
 ```
 
-El classpath inclou les dues biblioteques principals. Les dependències
-addicionals necessàries per a les gràfiques es carreguen durant l'execució
-mitjançant `lib\lib\*`.
+El classpath incluye las bibliotecas principales; `lib\lib\*` cubre JFreeChart en ejecución.
 
-### Comprovació de la representació
-
-Abans d'executar la bateria completa, es pot comprovar la coherència de
-l'estat, les inicialitzacions i les operacions:
+### Comprobación de la representación
 
 ```powershell
 java -cp "out;lib\CentralEnergia.jar;lib\AIMA.jar;lib\lib\*" `
   IA.PracticaEnergia.PruebaEstado
 ```
 
-També es pot executar una comprovació ràpida de la bateria:
+Comprobación rápida de la batería:
 
 ```powershell
 java -cp "out;lib\CentralEnergia.jar;lib\AIMA.jar;lib\lib\*" `
   IA.PracticaEnergia.MainExperimentos smoke
 ```
 
-### Execució dels experiments
-
-Per executar tots els experiments amb les configuracions encadenades:
+### Ejecución de los experimentos
 
 ```powershell
 java -Xmx2g -cp "out;lib\CentralEnergia.jar;lib\AIMA.jar;lib\lib\*" `
   IA.PracticaEnergia.MainExperimentos todos
 ```
 
-També es pot executar un experiment concret indicant el seu identificador:
+Un experimento concreto:
 
 ```powershell
 java -Xmx2g -cp "out;lib\CentralEnergia.jar;lib\AIMA.jar;lib\lib\*" `
   IA.PracticaEnergia.MainExperimentos 1
 ```
 
-Els identificadors disponibles són del `1` al `8`. També es poden utilitzar
-els àlies `smoke`, `heuristicas` i `comparativa` per a les execucions
-corresponents.
+Identificadores del `1` al `8`; alias `smoke`, `heuristicas`, `comparativa`. Para reproducir la batería completa, usar una sola invocación de `todos`. Cada experimento escribe `results/expN.csv`.
 
-Quan s'executa `todos`, els experiments es llancen en ordre i les eleccions
-realitzades als experiments inicials es reutilitzen en els següents. Per això,
-per reproduir exactament la bateria completa, és preferible executar
-`MainExperimentos todos` en una única invocació.
-
-Cada experiment escriu el detall de les rèpliques a `results/expN.csv`.
-L'execució també mostra per terminal els resums de les mitjanes i les
-desviacions típiques.
-
-### Generació de figures i comparacions
-
-Un cop creats els CSV, es generen les figures:
+### Generación de figuras y comparaciones
 
 ```powershell
 java -cp "out;lib\CentralEnergia.jar;lib\AIMA.jar;lib\lib\*" `
   IA.PracticaEnergia.Graficas
 ```
 
-Les figures es desen a `results/` amb noms com
-`fig1a-operadores.png` i `fig8-hc-vs-sa.png`.
-
-Per executar les comparacions rèplica a rèplica i obtenir els contrastos
-binomials:
-
 ```powershell
 java -cp "out;lib\CentralEnergia.jar;lib\AIMA.jar;lib\lib\*" `
   IA.PracticaEnergia.Comparaciones
 ```
 
-### Generació del report
-
-Finalment, des de l'arrel del repositori, es genera el document amb:
+### Generación del informe
 
 ```powershell
-quarto render report\report.qmd
+cd report
+quarto render report.qmd
 ```
 
-El PDF resultant es desa al directori `report/`. Perquè les figures apareguin
-correctament, cal haver executat prèviament `Graficas` i conservar la carpeta
-`results/` en la ubicació esperada.
+El PDF se genera como `report/Practica-energia-informe.pdf` (cierra `report.pdf` si el visor lo tiene abierto, para evitar errores de bloqueo en Windows). Ejecutar antes `Graficas` y conservar `results/`.
 
-## Anàlisi i discussió
+## Análisis y discusión
 
-Els experiments permeten analitzar separadament els principals factors que
-afecten la cerca: la forma del veïnatge, la qualitat de l'estat inicial, la
-funció heurística i l'algoritme utilitzat. Les comparacions s'han de llegir
-conjuntament amb el temps de còmput i amb la validesa de les solucions, perquè
-un benefici més alt no és suficient si s'obté incomplint una restricció.
+Los experimentos separan el efecto del vecindario, la inicialización, la heurística y el algoritmo. Hay que leer beneficio junto con tiempo y validez.
 
-### Importància dels operadors
+### Importancia de los operadores
 
-El resultat més clar és que els operadors que permeten obrir i tancar centrals
-tenen un efecte més gran que l'ampliació indiscriminada del veïnatge. Els
-operadors simples poden moure clients, però sovint no modifiquen el conjunt de
-centrals enceses i, per tant, no poden transformar directament una meseta en
-una millora de benefici. Els operadors compostos resolen aquesta limitació
-amb una sola transició.
+Abrir y cerrar centrales impacta más que inflar el vecindario sin sentido. Los operadores simples suelen dejar igual el conjunto de centrales encendidas; los compuestos convierten mesetas en mejoras en un paso. `COMPLETO` no mejora el beneficio frente a `MOVER_ASIGNAR_CENTRALES` pero sí el coste.
 
-El conjunt `COMPLETO` no millora el benefici respecte de
-`MOVER_ASIGNAR_CENTRALES` en les dades disponibles, però sí que augmenta el
-cost de la cerca. Això indica que afegir successors només és útil quan aporta
-moviments que l'algoritme no pot obtenir amb el conjunt compost.
+### Efecto de la solución inicial
 
-### Efecte de la solució inicial
+`VORAZ` es el factor más estable: mejor beneficio inicial y final que `ALEATORIA`. La búsqueda sigue siendo necesaria; la inicialización condiciona la región alcanzable en presencia de mesetas.
 
-La inicialització `VORAZ` és el factor més consistent entre les comparacions
-de l'estat inicial. Parteix d'un benefici més alt i acaba superant
-`ALEATORIA` en les 10 rèpliques comparades. La cerca continua sent necessària,
-però comença des d'una configuració que ja reutilitza millor les centrals
-enceses i la capacitat disponible.
+### Papel de las heurísticas
 
-Això mostra que, en un problema de cerca local amb mesetes, la inicialització
-no és només una qüestió de temps d'arrencada: condiciona quina zona de l'espai
-de solucions es pot explorar amb el nombre de moviments disponible.
+H1 coincide con el objetivo real. H2 y H3 desempatan con operadores simples; H3 mejora significativamente a H1 en ese régimen. Con compuestos, H1 suele bastar porque el vecindario ya expresa encendido/apagado.
 
-### Paper de les heurístiques
+### Comparación de los algoritmos
 
-H1 és el criteri més directe perquè coincideix amb l'objectiu real. H2 i H3
-aporten informació addicional quan els operadors simples generen moviments amb
-el mateix benefici. En particular, H3 obté una millora estadísticament
-significativa respecte d'H1 en aquesta configuració d'operadors, mentre que H2
-no presenta una diferència significativa amb el pes comparat.
+Simulated Annealing ayuda cuando Hill Climbing queda en mesetas con operadores simples. Con compuestos, calidad similar y HC más rápido. La elección depende de si el vecindario expresa las transiciones relevantes.
 
-Quan s'utilitzen operadors compostos, les heurístiques secundàries deixen de
-ser tan necessàries: el moviment ja pot incloure el canvi d'activar o
-desactivar una central i H1 pot detectar directament la millora. Això no
-significa que H2 i H3 siguin incorrectes, sinó que el seu avantatge depèn de
-la capacitat expressiva del veïnatge.
+### Calidad y coste computacional
 
-### Comparació dels algoritmes
+Hay compromiso entre beneficio y tiempo: más $k$ o iteraciones no siempre pagan. Más centrales no garantiza más beneficio. Evaluar con varias métricas, no una sola media.
 
-Simulated Annealing és útil quan Hill Climbing queda atrapat en una meseta
-formada per operadors simples. En aquest cas supera Hill Climbing en totes les
-rèpliques comparades. Amb operadors compostos, en canvi, els dos algoritmes
-obtenen resultats similars i Hill Climbing té un cost temporal inferior.
+## Conclusiones
 
-La conclusió no és que un algoritme sigui sempre millor que l'altre. La
-selecció depèn de si el veïnatge permet expressar les transicions importants:
-quan no les permet, el mecanisme d'acceptació de Simulated Annealing és útil;
-quan sí que les permet, l'exploració exhaustiva del veïnatge de Hill Climbing
-resulta més eficient.
+La práctica modela la distribución de energía como búsqueda local con capacidad, pérdidas y clientes garantizados. `EstadoEnergia` mantiene magnitudes de forma incremental.
 
-### Qualitat i cost computacional
+1. **Los operadores compuestos son determinantes.** `MOVER_ASIGNAR_CENTRALES` supera claramente a operadores simples al modificar centrales en una transición.
 
-Els resultats mostren un compromís entre benefici i temps. Augmentar $k$ o el
-nombre d'iteracions pot incrementar el nombre d'estats examinats sense
-produir una millora proporcional del benefici. Igualment, disposar de més
-centrals no implica necessàriament un benefici més alt, perquè les centrals
-enceses tenen un cost.
+2. **La solución inicial voraz es preferible.** `VORAZ` supera a `ALEATORIA` en las réplicas comparadas.
 
-Per tant, la configuració s'ha d'avaluar amb un conjunt de mètriques i no amb
-una única mitjana. El benefici mesura la qualitat econòmica, mentre que el
-temps i els nodes expandits mesuren el cost de trobar-la i les mètriques de
-servei comproven que la solució respecta les condicions del problema.
+3. **Las heurísticas secundarias dependen del vecindario.** H2/H3 rompen mesetas con operadores simples; con compuestos, H1 suele ser suficiente.
 
-## Conclusions
+4. **Simulated Annealing ayuda ante mesetas.** Con simples puede superar a HC; con compuestos, HC alcanza calidad similar con menos tiempo.
 
-La pràctica ha modelat la distribució d'energia com un problema de cerca local
-amb restriccions de capacitat, pèrdues de transport i clients amb servei
-garantit. La representació incremental de `EstadoEnergia` permet avaluar i
-actualitzar els successors sense recalcular tota l'assignació.
+5. **Capacidad y pérdidas condicionan la factibilidad.** Más clientes o centrales cambia el espacio de búsqueda sin garantizar mejor beneficio.
 
-Les conclusions principals són:
+En conjunto, para el escenario estudiado: inicialización `VORAZ`, operadores `MOVER_ASIGNAR_CENTRALES` y vecindario moderado ($k = 8$ para Hill Climbing), equilibrando beneficio y cómputo frente al conjunto completo. Conclusión para los parámetros probados, no optimalidad global.
 
-1. **Els operadors compostos són determinants.**
-   `MOVER_ASIGNAR_CENTRALES` obté un benefici clarament superior als operadors
-   simples perquè pot obrir i tancar centrals en una mateixa transició.
 
-2. **La solució inicial voraç és preferible.**
-   `VORAZ` supera `ALEATORIA` en les rèpliques comparades i proporciona un punt
-   de partida de més qualitat per a la cerca.
-
-3. **Les heurístiques secundàries depenen del veïnatge.**
-   H2 i H3 poden trencar mesetes quan els operadors són simples, però amb
-   operadors compostos el benefici pur H1 acostuma a ser suficient.
-
-4. **Simulated Annealing és útil en presència de mesetes.**
-   Amb operadors simples pot superar Hill Climbing, però quan el veïnatge ja
-   conté els moviments compostos necessaris, Hill Climbing aconsegueix una
-   qualitat similar amb menys temps.
-
-5. **La capacitat i les pèrdues condicionen la factibilitat.**
-   Augmentar el nombre de centrals o el nombre de clients modifica tant
-   l'espai de cerca com la possibilitat de servir tota la demanda, i no
-   garanteix per si sol una millora del benefici.
-
-En conjunt, la configuració més equilibrada per a l'escenari estudiat és la
-inicialització `VORAZ`, els operadors `MOVER_ASIGNAR_CENTRALES` i un veïnatge
-moderat, com $k = 8$ per a Hill Climbing. Aquesta recomanació combina el
-benefici observat amb un cost de còmput inferior al del conjunt complet. Es
-tracta d'una conclusió per a l'escenari i els paràmetres estudiats, no d'una
-garantia d'optimalitat global.
 
 ## Treball d'innovació
 
