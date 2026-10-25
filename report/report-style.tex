@@ -8,23 +8,20 @@
 \definecolor{projectblue}{HTML}{1F4E79}
 \definecolor{projectlight}{HTML}{EAF2F8}
 \definecolor{projectgray}{HTML}{5B6573}
-\pretitle{\begin{center}\color{projectblue}\Huge\bfseries}
-\posttitle{\par\end{center}\vspace{0.6em}}
-\preauthor{\begin{center}\large}
-\postauthor{\par\end{center}}
-\predate{\begin{center}\small\color{projectgray}}
-\postdate{\par\end{center}\vfill}
-\titleformat{\chapter}[display]
-  {\normalfont\huge\bfseries\color{projectblue}}
-  {\chaptertitlename\ \thechapter}{12pt}{\Huge}
-\titleformat{\section}
-  {\normalfont\Large\bfseries\color{projectblue}}
-  {\thesection}{0.8em}{}
-\titleformat{\subsection}
-  {\normalfont\large\bfseries\color{projectblue}}
-  {\thesubsection}{0.8em}{}
-\setlist[itemize]{topsep=4pt,itemsep=2pt}
-\setlist[enumerate]{topsep=4pt,itemsep=2pt}
-\setlength{\parskip}{5pt}
+\setlist[itemize]{topsep=2pt,itemsep=1pt,parsep=0pt}
+\setlist[enumerate]{topsep=2pt,itemsep=1pt,parsep=0pt}
+\setlength{\parskip}{4pt}
 \setlength{\parindent}{0pt}
 \setcounter{secnumdepth}{2}
+\titleformat{\section}
+  {\normalfont\Large\bfseries\color{projectblue}}
+  {\thesection}{0.5em}{}
+\titleformat{\subsection}
+  {\normalfont\large\bfseries\color{projectblue}}
+  {\thesubsection}{0.5em}{}
+\titlespacing*{\section}{0pt}{1.2ex plus .2ex minus .2ex}{0.8ex plus .1ex minus .1ex}
+\titlespacing*{\subsection}{0pt}{1ex plus .2ex}{0.6ex plus .1ex}
+\AtBeginDocument{%
+  \tableofcontents
+  \newpage
+}

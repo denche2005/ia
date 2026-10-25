@@ -4,17 +4,18 @@ subtitle: "Distribución de energía eléctrica"
 author: "Denys Cherednychenko · Albert Piñol Boncompte · Biel Bernat Cuscó Collelldemont"
 date: 2026-10-20
 lang: es
+title-block: false
 format:
   pdf:
     output-file: "Practica-energia-informe.pdf"
     documentclass: scrreprt
+    toc: false
     papersize: a4
     geometry:
       - top=2.4cm
       - bottom=2.4cm
       - left=2.7cm
       - right=2.7cm
-    toc: true
     number-sections: true
     colorlinks: true
     linkcolor: "blue!55!black"
@@ -32,14 +33,23 @@ execute:
 
 ## Introducción
 
-Este informe documenta la primera práctica de la asignatura Inteligencia Artificial (GCED-UPC): resolver la asignación de clientes a centrales eléctricas mediante **búsqueda local** con **Hill Climbing** y **Simulated Annealing** sobre la infraestructura de **AIMA**. El objetivo es maximizar el beneficio net respetando capacidad, contratos garantizados y pérdidas de transporte. La conclusión central del trabajo es que el rendimiento depende menos del algoritmo elegido que del **diseño del vecindario** —en particular, operadores compuestos que encienden o apagan centrales— y de una **inicialización voraz** de calidad, porque el beneficio presenta **mesetas** cuando solo se reasignan clientes entre centrales ya activas.
+El trabajo aborda la asignación de clientes a centrales eléctricas como un problema de búsqueda local. Hay que decidir qué clientes se sirven desde cada central (o si quedan sin servir) maximizando el beneficio neto, respetando la capacidad de producción, los contratos con suministro garantizado y el modelado de pérdidas en el transporte.
+
+La resolución se apoya en Hill Climbing y Simulated Annealing mediante las clases de AIMA. Nosotros implementamos la representación del estado, los operadores, las heurísticas y la batería de experimentos; los algoritmos de búsqueda los aporta la biblioteca.
+
+En el enunciado, una central encendida consume el coste de toda su producción aunque no esté llena, y mover clientes entre centrales ya activas a menudo no cambia el beneficio. Eso genera mesetas en la función objetivo. Por eso el diseño del vecindario (operadores que abren o cierran centrales) y una buena solución inicial voraz resultaron tan importantes como la elección entre HC y SA.
+
+El informe describe la representación, los experimentos del PDF y las conclusiones extraídas de las réplicas. Las figuras resumen las comparaciones entre operadores, inicialización, heurísticas y algoritmos.
 
 ## Organización del equipo
 
-- **Integrantes:** Denys Cherednychenko, Albert Piñol Boncompte y Biel Bernat Cuscó Collelldemont.
-- **Mecanismos de comunicación:** canal de Discord del grupo para consultas rápidas, enlaces al repositorio y avisos; reuniones síncronas para decisiones de diseño y reparto de tareas.
-- **Calendario de reuniones y acuerdos:** reuniones de **1 hora cada miércoles** desde el **16/9/2025**; en ellas se revisó el guión semanal, se fijaron prioridades de implementación (estado, operadores, experimentos) y criterios para las figuras del informe.
-- **Resolución de discrepancias:** consenso en reunión; si persistía la duda, se probaba la alternativa con una ejecución corta (`smoke` o un subconjunto de réplicas) y se adoptaba la opción con mejor beneficio o menor coste computacional.
+Integrantes: Denys Cherednychenko, Albert Piñol Boncompte y Biel Bernat Cuscó Collelldemont.
+
+Mecanismos de comunicación: canal de Discord del grupo (consultas, enlaces al repositorio y avisos) y reuniones síncronas para decisiones de diseño y reparto de tareas.
+
+Calendario de reuniones y acuerdos: reuniones de una hora cada miércoles desde el 16/9/2025. En ellas revisamos el guión semanal, prioridades de implementación (estado, operadores, experimentos) y criterios para las figuras del informe.
+
+Resolución de discrepancias: consenso en reunión; si persistía la duda, repetíamos un subconjunto de réplicas con la misma semilla y adoptábamos la opción con mejor beneficio o menor tiempo de cómputo.
 
 ### Seguimiento del guión y reparto de tareas
 
@@ -52,7 +62,7 @@ Este informe documenta la primera práctica de la asignatura Inteligencia Artifi
 | 5 | Planificar, ejecutar y analizar experimentos | Denys, Albert; Biel (figuras y revisiones) | Completado |
 | 6 | Documentación e informe final | Los tres (redacción conjunta) | Completado |
 
-Denys y Albert concentraron la mayor parte del **código Java** (estado, operadores, experimentos y gráficas). Biel participó de forma más limitada en la implementación, pero asistió a las reuniones, colaboró en partes de los experimentos y en la preparación de figuras, y los **tres** redactaron el informe final.
+Denys y Albert concentraron la mayor parte del código Java (estado, operadores, experimentos y gráficas). Biel participó de forma más limitada en la implementación, pero asistió a las reuniones, colaboró en partes de los experimentos y en la preparación de figuras, y los tres redactaron el informe final.
 
 ## Estructura del proyecto {.unnumbered}
 
@@ -76,7 +86,7 @@ repo_PRAC1/
 └── *.gitignore*              Reglas de Git para el repositorio.
 ```
 
-La carpeta `src/IA/PracticaEnergia/` contiene el **código desarrollado por el grupo**. Los
+La carpeta `src/IA/PracticaEnergia/` contiene el código desarrollado por el grupo. Los
 archivos más importantes son:
 
 - `EstadoEnergia.java`: representa un estado e implementa las operaciones sobre las asignaciones de clientes a centrales.
@@ -95,11 +105,9 @@ archivos más importantes son:
 
 - `PruebaEstado.java`: comprueba la coherencia de la representación, los operadores y las soluciones iniciales.
 
-`lib/` y `docs/` son **material externo** que no forma parte del código desarrollado por el grupo.
+`lib/` y `docs/` son material externo que no forma parte del código desarrollado por el grupo.
 
-La carpeta `lib/` contiene las **bibliotecas necesarias para compilar y ejecutar el proyecto**. `docs/` conserva el **material de consulta**, `results/` contiene los
-**resultados generados por los experimentos** y `report/` contiene la **fuente y el PDF del informe**. La carpeta `out/` es un directorio generado durante la compilación y
-contiene los archivos `.class`; no es código fuente.
+La carpeta `lib/` contiene las bibliotecas necesarias para compilar y ejecutar el proyecto. `docs/` conserva material de consulta, `results/` los resultados de los experimentos y `report/` la fuente del informe. La carpeta `out/` es un directorio generado durante la compilación y contiene los archivos `.class`; no es código fuente.
 
 ## Contexto y materiales
 
@@ -212,7 +220,7 @@ y **`aima.search`**. El resultado del código propio se guarda en `out/`.
 
 ```powershell
 java -cp "out;lib\CentralEnergia.jar;lib\AIMA.jar;lib\lib\*" `
-  IA.PracticaEnergia.MainExperimentos smoke
+  IA.PracticaEnergia.MainExperimentos todos
 ```
 
 Las clases de **`IA.PracticaEnergia`** se cargan desde `out/`, mientras que
@@ -503,10 +511,11 @@ Por tanto, la heurística debe priorizar estados con mayor beneficio final poten
 El criterio principal es el **beneficio real del problema**:
 
 $$
-B(s) =
-\text{ingresos de los clientes servidos}
-- \text{coste de las centrales encendidas}
-- \text{indemnizaciones de clientes no garantizados no servidos}.
+\begin{aligned}
+B(s) &= \text{ingresos de los clientes servidos} \\
+&\quad - \text{coste de las centrales encendidas} \\
+&\quad - \text{indemnizaciones de clientes no garantizados no servidos}.
+\end{aligned}
 $$
 
 Las **restricciones de capacidad y asignación** se aplican al generar sucesores, de modo que no hace falta añadirlas como penalizaciones a la función
@@ -565,32 +574,29 @@ Como el estado mantiene de forma incremental beneficio, pérdidas y capacidad oc
 
 ## Pipeline de ejecución {#sec-pipeline}
 
-Antes de analizar algoritmos y resultados, conviene ver **cómo se encadenan los componentes del proyecto durante una ejecución**.
+Antes de analizar algoritmos y resultados, conviene ver cómo se encadenan los componentes del proyecto durante una ejecución.
 
 La batería de experimentos no implementa la búsqueda directamente: prepara los datos, crea el estado inicial y delega la búsqueda en las clases de AIMA.
 
-El **flujo general** es:
+El flujo general es:
 
-**MainExperimentos.java**
+```text
+MainExperimentos.java
   ├─ inicializa el escenario
   ├─ crea el estado inicial
-  └─ llama a **Ejecucion.java**
-       ├─ crea el generador de sucesores
-       ├─ crea el problema de búsqueda con **Problem** (AIMA)
-       ├─ crea el agente con **SearchAgent** (AIMA)
-       ├─ crea **HillClimbingSearch** o **SimulatedAnnealingSearch** (AIMA)
-       └─ ejecuta **HillClimbingSearch** o **SimulatedAnnealingSearch**
-            ├─ pide sucesores a **GeneradorSucesoresHC.java** o **GeneradorSucesoresSA.java**
-            │    └─ aplica operadores sobre copias de **EstadoEnergia.java**
-            ├─ evalúa estados con **FuncionHeuristica.java**
-            └─ comprueba el criterio de parada con **EstadoFinal.java**
-       └─ recoge el resultado y lo escribe en **results/expN.csv**
+  └─ llama a Ejecucion.java
+       ├─ generador de sucesores (HC o SA)
+       ├─ Problem, SearchAgent, HillClimbingSearch o SimulatedAnnealingSearch
+       ├─ sucesores desde GeneradorSucesoresHC/SA sobre copias de EstadoEnergia
+       ├─ evaluación con FuncionHeuristica; parada con EstadoFinal
+       └─ resultado en results/expN.csv
+```
 
 ### Entrada y preparación del experimento
 
 La ejecución comienza en el método `main` de `MainExperimentos`.
 
-El argumento de línea de comandos **selecciona un experimento** (`1` a `8`), todos los experimentos (`todos`) o una comprobación rápida (`smoke`).
+El argumento de línea de comandos selecciona un experimento (`1` a `8`) o todos los experimentos (`todos`).
 
 Antes de cada réplica, `MainExperimentos` **fija la configuración del escenario base**: número y tipos de centrales, número de clientes, proporción de garantizados y tamaño del vecindario `k`.
 
@@ -696,9 +702,9 @@ Las métricas principales son el **beneficio final**, el **tiempo de cómputo**,
 
 ### Operadores y tamaño del vecindario
 
-**Expectativa:** Los operadores que abren o cierran centrales deberían elevar el beneficio respecto a movimientos que solo reasignan clientes; ampliar demasiado el vecindario (`k`) aumentará el coste sin ganancias proporcionales.
+Expectativa: Los operadores que abren o cierran centrales deberían elevar el beneficio respecto a movimientos que solo reasignan clientes; ampliar demasiado el vecindario (`k`) aumentará el coste sin ganancias proporcionales.
 
-**Resultado:** Con Hill Climbing, inicialización `VORAZ` y escenario base, `MOVER`, `MOVER_ASIGNAR` y `MOVER_INTERCAMBIAR` dan un beneficio medio similar (~1.207.656 €). `MOVER_ASIGNAR_CENTRALES` alcanza ~1.358.883 €; frente a `MOVER_ASIGNAR` gana 10/10 réplicas ($p = 0{,}002$). `COMPLETO` iguala el beneficio de los compuestos con más tiempo. Con operadores compuestos, el beneficio es estable en los `k` probados; $k = 8$ equilibra calidad y cómputo.
+Resultado: Con Hill Climbing, inicialización `VORAZ` y escenario base, `MOVER`, `MOVER_ASIGNAR` y `MOVER_INTERCAMBIAR` dan un beneficio medio similar (~1.207.656 €). `MOVER_ASIGNAR_CENTRALES` alcanza ~1.358.883 €; frente a `MOVER_ASIGNAR` gana 10/10 réplicas ($p = 0{,}002$). `COMPLETO` iguala el beneficio de los compuestos con más tiempo. Con operadores compuestos, el beneficio es estable en los `k` probados; $k = 8$ equilibra calidad y cómputo.
 
 ![Beneficio según el conjunto de operadores.](../results/fig1a-operadores.png){width=88%}
 
@@ -706,9 +712,9 @@ Las métricas principales son el **beneficio final**, el **tiempo de cómputo**,
 
 ### Estrategia de solución inicial
 
-**Expectativa:** La inicialización voraz debería partir de más centrales reutilizadas y acabar con mejor beneficio que una semilla aleatoria, aunque deje menos margen de mejora local.
+Expectativa: La inicialización voraz debería partir de más centrales reutilizadas y acabar con mejor beneficio que una semilla aleatoria, aunque deje menos margen de mejora local.
 
-**Resultado:** `VORAZ` supera a `ALEATORIA` en las 10 réplicas (~1.358.883 € frente a ~1.282.558 €; ~76.325 € de diferencia media, $p = 0{,}002$). La aleatoria permite más pasos de mejora, pero no compensa el peor punto de partida.
+Resultado: `VORAZ` supera a `ALEATORIA` en las 10 réplicas (~1.358.883 € frente a ~1.282.558 €; ~76.325 € de diferencia media, $p = 0{,}002$). La aleatoria permite más pasos de mejora, pero no compensa el peor punto de partida.
 
 ![Beneficio de las soluciones iniciales.](../results/fig2a-inicial-beneficio.png){width=88%}
 
@@ -716,9 +722,9 @@ Las métricas principales son el **beneficio final**, el **tiempo de cómputo**,
 
 ### Parámetros de Simulated Annealing
 
-**Expectativa:** Temperaturas más altas o más iteraciones exploran más pero encarecen la ejecución; conviene fijar parámetros razonables antes de comparar con Hill Climbing.
+Expectativa: Temperaturas más altas o más iteraciones exploran más pero encarecen la ejecución; conviene fijar parámetros razonables antes de comparar con Hill Climbing.
 
-**Resultado:** En el barrido inicial, $\lambda$ pequeños mantienen temperatura efectiva más tiempo (más cómputo) con diferencias de beneficio modestas. Se fijan 100.000 iteraciones, 1.000 por temperatura, $k = 5$ y $\lambda = 0{,}01$ por equilibrio calidad/tiempo, no solo por un máximo puntual.
+Resultado: En el barrido inicial, $\lambda$ pequeños mantienen temperatura efectiva más tiempo (más cómputo) con diferencias de beneficio modestas. Se fijan 100.000 iteraciones, 1.000 por temperatura, $k = 5$ y $\lambda = 0{,}01$ por equilibrio calidad/tiempo, no solo por un máximo puntual.
 
 ![Beneficio según la temperatura y el vecindario.](../results/fig3a-temperatura-beneficio.png){width=88%}
 
@@ -728,9 +734,9 @@ Las métricas principales son el **beneficio final**, el **tiempo de cómputo**,
 
 ### Escalabilidad con el número de clientes y centrales
 
-**Expectativa:** El tiempo debería crecer al aumentar clientes o centrales porque hay más movimientos que evaluar.
+Expectativa: El tiempo debería crecer al aumentar clientes o centrales porque hay más movimientos que evaluar.
 
-**Resultado:** Con centrales fijas, el tiempo crece con el número de clientes; al aumentar centrales, también crecen las alternativas. El coste depende del tamaño de la asignación y del vecindario, no solo del beneficio.
+Resultado: Con centrales fijas, el tiempo crece con el número de clientes; al aumentar centrales, también crecen las alternativas. El coste depende del tamaño de la asignación y del vecindario, no solo del beneficio.
 
 ![Tiempo según el número de clientes.](../results/fig4a-escalado-clientes.png){width=88%}
 
@@ -738,25 +744,25 @@ Las métricas principales son el **beneficio final**, el **tiempo de cómputo**,
 
 ### Penalización de los clientes garantizados no servidos
 
-**Expectativa:** Penalizar clientes garantizados no servidos permite estudiar la restricción como coste blando; umbrales altos deberían recuperar soluciones válidas.
+Expectativa: Penalizar clientes garantizados no servidos permite estudiar la restricción como coste blando; umbrales altos deberían recuperar soluciones válidas.
 
-**Resultado:** En modo penalización, Hill Climbing con **100 €/MWh** deja **10/10** réplicas válidas; Simulated Annealing necesita alrededor de **500 €/MWh** para el mismo efecto. La validez debe interpretarse aparte del beneficio: más beneficio con garantizados incumplidos no equivale a una solución factible en el modo normal.
+Resultado: En modo penalización, Hill Climbing con **100 €/MWh** deja **10/10** réplicas válidas; Simulated Annealing necesita alrededor de **500 €/MWh** para el mismo efecto. La validez debe interpretarse aparte del beneficio: más beneficio con garantizados incumplidos no equivale a una solución factible en el modo normal.
 
 ![Efecto de la penalización de los clientes garantizados.](../results/fig5-penalizacion.png){width=88%}
 
 ### Ampliación del parque de centrales
 
-**Expectativa:** Más centrales tipo C no implica necesariamente más beneficio: centrales encendidas sin uso elevan costes.
+Expectativa: Más centrales tipo C no implica necesariamente más beneficio: centrales encendidas sin uso elevan costes.
 
-**Resultado:** Al pasar de 25 a 50 y 75 centrales de tipo C, el uso medio de **C** sube (~21,5 → ~34,7 en HC), **A** y **B** bajan ligeramente (~5,0 → ~4,5 y ~9,8 → ~9,2), el **beneficio** cae (~1,36 M€ → ~1,15 M€) y Simulated Annealing es **~20–25 veces más lento** que Hill Climbing (p. ej. ~311 ms frente a ~12 ms con 25 centrales C).
+Resultado: Al pasar de 25 a 50 y 75 centrales de tipo C, el uso medio de **C** sube (~21,5 → ~34,7 en HC), **A** y **B** bajan ligeramente (~5,0 → ~4,5 y ~9,8 → ~9,2), el **beneficio** cae (~1,36 M€ → ~1,15 M€) y Simulated Annealing es **~20–25 veces más lento** que Hill Climbing (p. ej. ~311 ms frente a ~12 ms con 25 centrales C).
 
 ![Centrales encendidas al ampliar el parque de centrales tipo C.](../results/fig6-tipos-centrales.png){width=88%}
 
 ### Comparación de las heurísticas
 
-**Expectativa:** H2 y H3 deberían desempatar mesetas con operadores simples; con compuestos, H1 bastará.
+Expectativa: H2 y H3 deberían desempatar mesetas con operadores simples; con compuestos, H1 bastará.
 
-**Resultado:** Con `MOVER_ASIGNAR`, H3 ($w = 10$) gana a H1 en 10/10 réplicas ($p = 0{,}002$); H2 vs H1 no es significativo ($p = 0{,}0625$). Con operadores compuestos las diferencias entre heurísticas no son significativas. Las figuras muestran el efecto del peso secundario sobre beneficio real y pasos de Hill Climbing.
+Resultado: Con `MOVER_ASIGNAR`, H3 ($w = 10$) gana a H1 en 10/10 réplicas ($p = 0{,}002$); H2 vs H1 no es significativo ($p = 0{,}0625$). Con operadores compuestos las diferencias entre heurísticas no son significativas. Las figuras muestran el efecto del peso secundario sobre beneficio real y pasos de Hill Climbing.
 
 ![Beneficio real según la función heurística.](../results/fig7a-heuristicas.png){width=88%}
 
@@ -768,25 +774,21 @@ Las métricas principales son el **beneficio final**, el **tiempo de cómputo**,
 
 ### Hill Climbing y Simulated Annealing
 
-**Expectativa:** Simulated Annealing debería ayudar con mesetas de operadores simples; con compuestos, Hill Climbing debería ser más rápido con beneficio similar.
+Expectativa: Simulated Annealing debería ayudar con mesetas de operadores simples; con compuestos, Hill Climbing debería ser más rápido con beneficio similar.
 
-**Resultado:** Con `MOVER_ASIGNAR`, SA gana 10/10 réplicas (~97.411 € de media, $p = 0{,}002$). Con `MOVER_ASIGNAR_CENTRALES`, SA solo gana 3/10 ($p = 0{,}3438$); ambos alcanzan beneficio similar y HC usa menos tiempo.
+Resultado: Con `MOVER_ASIGNAR`, SA gana 10/10 réplicas (~97.411 € de media, $p = 0{,}002$). Con `MOVER_ASIGNAR_CENTRALES`, SA solo gana 3/10 ($p = 0{,}3438$); ambos alcanzan beneficio similar y HC usa menos tiempo.
 
 ![Comparación entre Hill Climbing y Simulated Annealing.](../results/fig8-hc-vs-sa.png){width=88%}
 
 ## Ejecución y reproducción
 
-Este apartado describe el procedimiento para repetir compilación, pruebas, experimentos y generación del informe.
+Este apartado describe el procedimiento para repetir compilación, pruebas y experimentos.
 
 ### Requisitos y directorio de trabajo
 
-Se necesita:
+Se necesita JDK 26 o superior y las bibliotecas `CentralEnergia.jar`, `AIMA.jar` y dependencias en `lib/lib/`.
 
-- **JDK 26 o superior**;
-- las bibliotecas `CentralEnergia.jar`, `AIMA.jar` y dependencias en `lib/lib/`;
-- **Quarto** y LaTeX si se quiere regenerar el PDF.
-
-Todas las órdenes se ejecutan desde la **raíz del repositorio**. Los CSV y figuras van a `results/`; las clases compiladas, a `out/`.
+Todas las órdenes se ejecutan desde la raíz del repositorio. Los CSV y figuras van a `results/`; las clases compiladas, a `out/`.
 
 ### Compilación
 
@@ -804,13 +806,6 @@ java -cp "out;lib\CentralEnergia.jar;lib\AIMA.jar;lib\lib\*" `
   IA.PracticaEnergia.PruebaEstado
 ```
 
-Comprobación rápida de la batería:
-
-```powershell
-java -cp "out;lib\CentralEnergia.jar;lib\AIMA.jar;lib\lib\*" `
-  IA.PracticaEnergia.MainExperimentos smoke
-```
-
 ### Ejecución de los experimentos
 
 ```powershell
@@ -825,7 +820,7 @@ java -Xmx2g -cp "out;lib\CentralEnergia.jar;lib\AIMA.jar;lib\lib\*" `
   IA.PracticaEnergia.MainExperimentos 1
 ```
 
-Identificadores del `1` al `8`; alias `smoke`, `heuristicas`, `comparativa`. Para reproducir la batería completa, usar una sola invocación de `todos`. Cada experimento escribe `results/expN.csv`.
+Identificadores del `1` al `8`; alias `heuristicas` y `comparativa`. Para reproducir la batería completa, usar una sola invocación de `todos`. Cada experimento escribe `results/expN.csv`.
 
 ### Generación de figuras y comparaciones
 
@@ -838,15 +833,6 @@ java -cp "out;lib\CentralEnergia.jar;lib\AIMA.jar;lib\lib\*" `
 java -cp "out;lib\CentralEnergia.jar;lib\AIMA.jar;lib\lib\*" `
   IA.PracticaEnergia.Comparaciones
 ```
-
-### Generación del informe
-
-```powershell
-cd report
-quarto render report.qmd
-```
-
-El PDF se genera como `report/Practica-energia-informe.pdf` (cierra `report.pdf` si el visor lo tiene abierto, para evitar errores de bloqueo en Windows). Ejecutar antes `Graficas` y conservar `results/`.
 
 ## Análisis y discusión
 
@@ -876,38 +862,50 @@ Hay compromiso entre beneficio y tiempo: más $k$ o iteraciones no siempre pagan
 
 La práctica modela la distribución de energía como búsqueda local con capacidad, pérdidas y clientes garantizados. `EstadoEnergia` mantiene magnitudes de forma incremental.
 
-1. **Los operadores compuestos son determinantes.** `MOVER_ASIGNAR_CENTRALES` supera claramente a operadores simples al modificar centrales en una transición.
+1. Los operadores compuestos son determinantes: `MOVER_ASIGNAR_CENTRALES` supera claramente a operadores simples al modificar centrales en una transición.
 
-2. **La solución inicial voraz es preferible.** `VORAZ` supera a `ALEATORIA` en las réplicas comparadas.
+2. La solución inicial voraz es preferible: `VORAZ` supera a `ALEATORIA` en las réplicas comparadas.
 
-3. **Las heurísticas secundarias dependen del vecindario.** H2/H3 rompen mesetas con operadores simples; con compuestos, H1 suele ser suficiente.
+3. Las heurísticas secundarias dependen del vecindario: H2/H3 rompen mesetas con operadores simples; con compuestos, H1 suele ser suficiente.
 
-4. **Simulated Annealing ayuda ante mesetas.** Con simples puede superar a HC; con compuestos, HC alcanza calidad similar con menos tiempo.
+4. Simulated Annealing ayuda ante mesetas: con operadores simples puede superar a HC; con compuestos, HC alcanza calidad similar con menos tiempo.
 
-5. **Capacidad y pérdidas condicionan la factibilidad.** Más clientes o centrales cambia el espacio de búsqueda sin garantizar mejor beneficio.
+5. Capacidad y pérdidas condicionan la factibilidad: más clientes o centrales cambia el espacio de búsqueda sin garantizar mejor beneficio.
 
 En conjunto, para el escenario estudiado: inicialización `VORAZ`, operadores `MOVER_ASIGNAR_CENTRALES` y vecindario moderado ($k = 8$ para Hill Climbing), equilibrando beneficio y cómputo frente al conjunto completo. Conclusión para los parámetros probados, no optimalidad global.
 
 
 
-## Treball d'innovació
+## Trabajo de innovación
 
-### Tema escollit
+Albert Piñol · Denys Cherednychenko · Bernat Cuscó Collelldemont
 
+### Tema elegido
 
+PathAI y Paige: diagnóstico de cáncer con visión por computador en anatomía patológica digital. Nos interesa comparar cómo estas empresas usan aprendizaje profundo sobre imágenes de láminas histológicas (whole slide imaging) para apoyar al patólogo, qué papel tiene la regulación (FDA) y qué límites éticos y clínicos implica que un algoritmo marque regiones sospechosas sin sustituir el criterio humano. Creemos que es un ejemplo muy claro de IA aplicada con impacto real en salud.
 
-### Repartiment del treball
+### Reparto del trabajo
 
-Qui s’ha encarregat de buscar la informació per a cada apartat del document:
+Responsables de la búsqueda de información para cada apartado del informe de innovación (documento del cuatrimestre):
 
-| Apartat del treball | Responsable de la cerca d’informació |
+| Apartado del trabajo | Responsable de la búsqueda |
 |---|---|
-| | |
+| Contexto del problema clínico y anatomía patológica digital | Albert |
+| PathAI: productos, enfoque técnico y validación | Denys |
+| Paige (Paige Prostate y ecosistema): regulación FDA y uso clínico | Bernat |
+| Marco ético, sesgos y papel del patólogo | Albert y Bernat |
+| Comparativa PathAI vs Paige y conclusiones del informe | Denys (coordinación) y revisión conjunta |
 
-### Referències trobades
+### Referencias encontradas
 
-| Referència | Apartats per als quals és rellevant | Data d’accés |
+| Referencia | Apartados relevantes | Fecha de acceso |
 |---|---|---|
-| | | |
+| FDA, De Novo DEN200080 — Paige Prostate (autorización 2021) | Paige, indicaciones de uso, límites como herramienta adjunta | 25/10/2026 |
+| FDA, resumen de decisión DEN200080 (Paige Prostate) | Validación clínica, deep learning, whole slide images | 25/10/2026 |
+| FDA, 510(k) K243391 — PathAI AISight Dx | PathAI, software de visualización en patología digital | 25/10/2026 |
+| FDA, 510(k) K241273 — Paige FullFocus | Visualización de láminas digitales, interoperabilidad | 25/10/2026 |
+| Campanella et al., *Nature Medicine* (2019) — IA en cáncer de mama en patología | Contexto clínico, rendimiento en cohortes reales | 25/10/2026 |
 
-### Dificultats trobades
+### Dificultades encontradas
+
+La documentación regulatoria (FDA) es precisa pero densa: hay que separar bien qué producto es algoritmo de detección (Paige Prostate) y qué producto es visor o plataforma (FullFocus, AISight Dx). También cuesta encontrar artículos divulgativos que no mezclen marketing con evidencia clínica; por eso hemos priorizado fuentes regulatorias y artículos en revistas médicas. Por último, muchos preprints usan conjuntos de datos privados, lo que complica comparar cifras de sensibilidad o especificidad entre PathAI y Paige de forma homogénea.
