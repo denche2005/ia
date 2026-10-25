@@ -1,141 +1,86 @@
 # Pràctica de cerca local: distribució d'energia
 
 Implementació en Java de la primera pràctica d'Intel·ligència Artificial
-(FIB-UPC): assignació de clients a centrals elèctriques maximitzant el benefici,
-resolta amb Hill Climbing i Simulated Annealing sobre la llibreria AIMA de
+(FIB-UPC). El projecte resol el problema d'assignar clients a centrals
+elèctriques maximitzant el benefici mitjançant els algoritmes **Hill
+Climbing** i **Simulated Annealing**, sobre la llibreria AIMA de
 l'assignatura.
 
-L'anàlisi detallada dels resultats és a [INFORME.md](INFORME.md). El resum
-preparat per lliurar en PDF és a [report/](report/).
+La descripció del model, les decisions d'implementació, els experiments i
+l'anàlisi dels resultats es troben a l'[informe del projecte](report/report.pdf).
+El seu codi font és a [report/report.qmd](report/report.qmd).
 
 ## Estructura
 
-```
-lib/
-  CentralEnergia.jar   libreria del enunciado, extraida de CentralEnergia.zip
-  AIMA.jar             libreria de la asignatura, extraida de AIMA.zip (dist/AIMA.jar)
-  lib/                 dependencias incluidas en AIMA.zip (dist/lib), como JFreeChart,
-                       iText y JUnit. No es una carpeta exclusiva de las demos:
-                       Graficas.java usa JFreeChart para generar las figuras del informe.
-                       Van en lib/lib porque el manifest de AIMA.jar declara
-                       "Class-Path: lib/..." relativo a la ubicacion de AIMA.jar.
+| Directori | Contingut |
+| --- | --- |
+| [`src/`](src/) | Codi propi de la pràctica: estat, operadors, heurístiques, execució i experiments. |
+| [`lib/`](lib/) | Llibreries binàries de l'enunciat i dependències d'AIMA. |
+| [`results/`](results/) | CSV, figures i sortides generades pels experiments. |
+| [`report/`](report/) | Font i PDF de l'informe. |
+| [`docs/`](docs/) | Documentació i codi font de consulta de les llibreries proporcionades. |
 
-src/IA/PracticaEnergia/
-  EstadoEnergia.java              representacion del estado, soluciones iniciales y operadores
-  ConjuntoOperadores.java         conjuntos de operadores que se comparan
-  GeneradorSucesoresHC.java       sucesores para Hill Climbing (todos)
-  GeneradorSucesoresSA.java       sucesores para Simulated Annealing (uno al azar)
-  FuncionHeuristica.java          las tres heuristicas: beneficio puro, perdidas, capacidad ociosa
-  EstadoFinal.java                test de estado final (siempre false)
-  Ejecucion.java                  lanza una busqueda via SearchAgent y recoge las medidas
-  Estadistica.java                medias, desviaciones y cuantiles de las replicas
-  MainExperimentos.java           los seis experimentos del enunciado y dos adicionales
-  Graficas.java                   genera las figuras del informe con JFreeChart
-  Comparaciones.java              contrastes binomiales por parejas sobre las replicas
-  PruebaEstado.java               pruebas de la representacion y los operadores
-  EscenarioInfactibleException.java
-
-docs/javadoc/          Javadoc de IA.Energia, inclòs amb el material de la pràctica
-
-docs/aima-src/         codi font d'AIMA, inclòs amb AIMA.src.zip, material de consulta
-
-results/               salida de los experimentos: csv, figuras png y texto
-```
-
-## Procedència i organització del material
-
-Els fitxers ZIP de la arrel són el material original proporcionat amb
-l'enunciat o amb el material docent. La relació entre l'origen i les còpies
-que s'utilitzen en el repositori és:
-
-| Element del repositori | Procedència | Funció |
-| --- | --- | --- |
-| `lib/AIMA.jar` | `AIMA.zip` (`dist/AIMA.jar`) | Llibreria AIMA que utilitza el codi propi |
-| `lib/lib/` | `AIMA.zip` (`dist/lib/`) | Dependències distribuïdes amb AIMA; JFreeChart és necessària per a `Graficas.java` |
-| `lib/CentralEnergia.jar` | `CentralEnergia.zip` | Llibreria del problema, amb el paquet `IA.Energia` |
-| `docs/aima-src/` | `AIMA.src.zip` | Codi font d'AIMA, conservat només com a material de consulta |
-| `docs/javadoc/` | `CentralEnergia.zip` | Javadoc de la llibreria `CentralEnergia.jar`, conservat com a documentació de consulta |
-
-Per tant, `src/` conté el codi desenvolupat per al grup, `lib/` conté les
-llibreries binàries necessàries per compilar-lo i executar-lo, i `docs/` conté
-còpies de consulta del material docent. Els ZIP originals es mantenen a la
-arrel per deixar traçable la procedència. No s'ha modificat el codi de `docs/`.
-
-### Per què existeix `lib/lib/`
-
-`lib/lib/` no s'ha de confondre amb una còpia innecessària ni amb una llibreria
-creada pel grup. És la carpeta `dist/lib/` que ja ve dins d'`AIMA.zip`. Conté,
-entre altres, els JAR de JFreeChart i JCommon que utilitza
-[`Graficas.java`](src/IA/PracticaEnergia/Graficas.java) per crear les figures
-de `results/`. També conté altres dependències que formen part de la
-distribució original d'AIMA.
-
-No es pot eliminar mantenint la funcionalitat actual. Només es podria treure
-si també s'eliminés `Graficas.java` o se substituís la generació de gràfics per
-una altra solució i es revisessin les dependències declarades al manifest
-de `AIMA.jar`.
+Els fitxers ZIP de l'arrel són el material original de la pràctica i del
+material docent. No formen part del codi desenvolupat pel grup.
 
 ## Requisits
 
-`CentralEnergia.jar` esta compilado con la version 26 del formato de class
-(`Created-By: 26.0.2`), asi que **hace falta un JDK 26 o superior**. Con un JDK anterior el
-compilador falla con `bad class file ... class file has wrong version 70.0`.
+- Windows PowerShell (les ordres següents fan servir el separador `;`).
+- JDK 26 o superior, perquè `CentralEnergia.jar` utilitza el format de classes
+  corresponent a aquesta versió.
+- Quarto i una instal·lació de LaTeX, només per regenerar l'informe PDF.
 
-`AIMA.jar` es el que se distribuye en la web de la asignatura dentro de `AIMA.zip`. No hace
-falta ninguna dependencia externa: las figuras se generan con el JFreeChart que ya viene entre
-sus librerias.
+No cal instal·lar dependències Java addicionals: les llibreries necessàries es
+troben dins de [`lib/`](lib/).
 
-## Compilar y ejecutar (Windows PowerShell)
+## Compilar i executar
+
+Des de l'arrel del repositori:
 
 ```powershell
-javac -Xlint:all,-path -cp "lib\CentralEnergia.jar;lib\AIMA.jar" -d out (Get-ChildItem -Recurse src -Filter *.java | % FullName)
-
-# pruebas de la representacion del estado y los operadores
-java -cp "out;lib\CentralEnergia.jar;lib\AIMA.jar" IA.PracticaEnergia.PruebaEstado
-
-# una ejecucion de cada configuracion, para comprobar que todo funciona
-java -cp "out;lib\CentralEnergia.jar;lib\AIMA.jar" IA.PracticaEnergia.MainExperimentos smoke
-
-# experimentos: 1..6 (los del enunciado), 7 (heuristicas), 8 (HC frente a SA) o todos
-java -Xmx2g -cp "out;lib\CentralEnergia.jar;lib\AIMA.jar" IA.PracticaEnergia.MainExperimentos todos
-
-# figuras del informe y contrastes estadisticos (leen los csv de results/)
-java -cp "out;lib\CentralEnergia.jar;lib\AIMA.jar" IA.PracticaEnergia.Graficas
-java -cp "out;lib\CentralEnergia.jar;lib\AIMA.jar" IA.PracticaEnergia.Comparaciones
+javac -cp "lib\CentralEnergia.jar;lib\AIMA.jar;lib\lib\*" `
+  -d out (Get-ChildItem -Recurse src -Filter *.java | ForEach-Object FullName)
 ```
 
-Per generar el report en PDF:
+Comprovar la representació de l'estat i els operadors:
+
+```powershell
+java -cp "out;lib\CentralEnergia.jar;lib\AIMA.jar;lib\lib\*" `
+  IA.PracticaEnergia.PruebaEstado
+```
+
+Fer una execució ràpida de totes les configuracions:
+
+```powershell
+java -cp "out;lib\CentralEnergia.jar;lib\AIMA.jar;lib\lib\*" `
+  IA.PracticaEnergia.MainExperimentos smoke
+```
+
+Executar els experiments:
+
+```powershell
+java -Xmx2g -cp "out;lib\CentralEnergia.jar;lib\AIMA.jar;lib\lib\*" `
+  IA.PracticaEnergia.MainExperimentos todos
+```
+
+També es pot executar un experiment concret amb els identificadors `1` a `8`
+(`heuristicas` i `comparativa` són àlies dels experiments 7 i 8).
+
+Les figures i les comparacions estadístiques es poden regenerar a partir dels
+CSV:
+
+```powershell
+java -cp "out;lib\CentralEnergia.jar;lib\AIMA.jar;lib\lib\*" `
+  IA.PracticaEnergia.Graficas
+java -cp "out;lib\CentralEnergia.jar;lib\AIMA.jar;lib\lib\*" `
+  IA.PracticaEnergia.Comparaciones
+```
+
+Per regenerar l'informe:
 
 ```powershell
 quarto render report\report.qmd
 ```
 
-Cierra cualquier pestaña del PDF (`report.pdf` o copias antiguas) antes de **Preview** o
-`quarto render`: en Windows el archivo queda bloqueado y Quarto no puede sobrescribirlo.
-La carpeta `report/` debe quedar solo con `report.qmd`, `report-style.tex` y `report.pdf`
-(el resto de auxiliares Quarto/LaTeX está en `.gitignore`).
-
-En Linux o macOS hay que cambiar los `;` del classpath por `:`.
-
-La bateria completa tarda unos dos minutos. Escribe un resumen por pantalla, el detalle de cada
-replica en `results/expN.csv` y las figuras en `results/fig*.png`.
-
-## Notas
-
-**Memoria.** El enunciado sugiere `-Xmx256m`, pero Hill Climbing materializa todos los sucesores
-de un nodo antes de elegir, asi que con el vecindario sin restringir (k=40) el pico puede superar
-ese limite. Con la configuracion por defecto (k=8) basta con `-Xmx512m`; `-Xmx2g` deja margen para
-las variantes con mas centrales.
-
-**Reproducibilidad.** Las semillas de la generacion de escenarios y del generador de sucesores
-estan fijadas, asi que los resultados de Hill Climbing se repiten exactamente. Los de Simulated
-Annealing no: `SimulatedAnnealingSearch` crea internamente un `java.util.Random` sin semilla. Por
-eso todas las conclusiones sobre el recocido se apoyan en medias sobre 10 replicas.
-
-**Avisos de compilación.** La API `SuccessorFunction` de AIMA utiliza `List`
-sin genéricos; los dos métodos adaptadores del proyecto lo indican
-explícitamente con `@SuppressWarnings("rawtypes")`. El manifiesto de la versión
-distribuida de AIMA referencia cuatro JAR opcionales de iText/Bouncy Castle que
-no se incluyen en `AIMA.zip`; por eso el comando de compilación usa
-`-Xlint:all,-path` para no mostrar esos avisos externos. Las dependencias
-necesarias para compilar y generar las gráficas sí están incluidas en `lib/lib/`.
+Els resultats dels experiments s'escriuen a [`results/`](results/) i el PDF
+generat a [`report/report.pdf`](report/report.pdf).
