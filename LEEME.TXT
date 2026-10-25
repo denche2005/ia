@@ -1,0 +1,97 @@
+PRACTICA DE BUSQUEDA LOCAL: DISTRIBUCION DE ENERGIA
+====================================================
+
+REQUISITOS
+----------
+
+- Windows PowerShell.
+- JDK 26 o superior.
+- Las bibliotecas incluidas en la carpeta lib:
+  CentralEnergia.jar, AIMA.jar y las dependencias de lib\lib\.
+
+No es necesario instalar dependencias Java adicionales.
+
+Todas las ordenes de este fichero deben ejecutarse desde la raiz del
+proyecto, es decir, desde la carpeta que contiene src, lib, out y results.
+
+
+COMPILACION
+-----------
+
+Para compilar el codigo fuente:
+
+javac -cp "lib\CentralEnergia.jar;lib\AIMA.jar;lib\lib\*" `
+  -d out (Get-ChildItem -Recurse src -Filter *.java |
+  Where-Object { $_.Name -ne 'Prueba0.java' } | % FullName)
+
+
+COMPROBACION DE LA REPRESENTACION
+----------------------------------
+
+Para comprobar que el estado, las soluciones iniciales y los operadores
+funcionan correctamente:
+
+java -cp "out;lib\CentralEnergia.jar;lib\AIMA.jar;lib\lib\*" `
+  IA.PracticaEnergia.PruebaEstado
+
+
+EJECUCION DE LOS EXPERIMENTOS
+------------------------------
+
+Para ejecutar todos los experimentos:
+
+java -Xmx2g -cp "out;lib\CentralEnergia.jar;lib\AIMA.jar;lib\lib\*" `
+  IA.PracticaEnergia.MainExperimentos todos
+
+Para ejecutar un experimento concreto:
+
+java -Xmx2g -cp "out;lib\CentralEnergia.jar;lib\AIMA.jar;lib\lib\*" `
+  IA.PracticaEnergia.MainExperimentos 1
+
+Los identificadores disponibles son del 1 al 8. Tambien se pueden usar
+los alias heuristicas y comparativa para los experimentos correspondientes.
+La opcion smoke permite hacer una ejecucion rapida de comprobacion:
+
+java -cp "out;lib\CentralEnergia.jar;lib\AIMA.jar;lib\lib\*" `
+  IA.PracticaEnergia.MainExperimentos smoke
+
+Los resultados detallados de los experimentos se escriben en la carpeta
+results, en archivos CSV.
+
+
+GENERACION DE FIGURAS Y COMPARACIONES
+--------------------------------------
+
+Despues de ejecutar los experimentos, las figuras se pueden generar con:
+
+java -cp "out;lib\CentralEnergia.jar;lib\AIMA.jar;lib\lib\*" `
+  IA.PracticaEnergia.Graficas
+
+Las comparaciones estadisticas se pueden generar con:
+
+java -cp "out;lib\CentralEnergia.jar;lib\AIMA.jar;lib\lib\*" `
+  IA.PracticaEnergia.Comparaciones
+
+
+INFORME
+-------
+
+El informe PDF entregado se encuentra en:
+
+report\report.pdf
+
+Para regenerarlo a partir del archivo fuente report\report.qmd se necesita
+Quarto y una instalacion de LaTeX:
+
+quarto render report\report.qmd
+
+
+ESTRUCTURA PRINCIPAL
+--------------------
+
+- src\       Codigo fuente Java de la practica.
+- lib\       Bibliotecas necesarias para compilar y ejecutar.
+- results\   CSV y figuras generados por los experimentos.
+- report\    Fuente QMD, estilo LaTeX e informe PDF.
+- out\       Clases Java compiladas.
+

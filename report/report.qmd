@@ -752,7 +752,7 @@ Resultado: En modo penalización, Hill Climbing con **100 €/MWh** deja **10/10
 
 Expectativa: Más centrales tipo C no implica necesariamente más beneficio: centrales encendidas sin uso elevan costes.
 
-Resultado: Al pasar de 25 a 50 y 75 centrales de tipo C, el uso medio de **C** sube (~21,5 → ~34,7 en HC), **A** y **B** bajan ligeramente (~5,0 → ~4,5 y ~9,8 → ~9,2), el **beneficio** cae (~1,36 M€ → ~1,15 M€) y Simulated Annealing es **~20–25 veces más lento** que Hill Climbing (p. ej. ~311 ms frente a ~12 ms con 25 centrales C).
+Resultado: Al pasar de 25 a 50 y 75 centrales de tipo C, el uso medio de **C** sube (~21,5 → ~34,7 en HC), **A** y **B** bajan ligeramente (~5,0 → ~4,5 y ~9,8 → ~9,2), el **beneficio** cae (~1,36 M€ → ~1,15 M€) y Simulated Annealing es **~20–25 veces más lento** que Hill Climbing (en la ejecución regenerada, ~359 ms frente a ~16 ms con 25 centrales C).
 
 ![Centrales encendidas al ampliar el parque de centrales tipo C.](../results/fig6-tipos-centrales.png){width=88%}
 
@@ -774,7 +774,7 @@ Resultado: Con `MOVER_ASIGNAR`, H3 ($w = 10$) gana a H1 en 10/10 réplicas ($p =
 
 Expectativa: Simulated Annealing debería ayudar con mesetas de operadores simples; con compuestos, Hill Climbing debería ser más rápido con beneficio similar.
 
-Resultado: Con `MOVER_ASIGNAR`, SA gana 10/10 réplicas (~97.411 € de media, $p = 0{,}002$). Con `MOVER_ASIGNAR_CENTRALES`, SA solo gana 3/10 ($p = 0{,}3438$); ambos alcanzan beneficio similar y HC usa menos tiempo.
+Resultado: Con `MOVER_ASIGNAR`, SA gana 10/10 réplicas (~98.486 € de diferencia media, $p = 0{,}002$). Con `MOVER_ASIGNAR_CENTRALES`, SA solo gana 3/10 ($p = 0{,}3438$); ambos alcanzan beneficio similar y HC usa menos tiempo.
 
 ![Comparación entre Hill Climbing y Simulated Annealing.](../results/fig8-hc-vs-sa.png){width=88%}
 
@@ -886,25 +886,23 @@ Para el informe de innovación del cuatrimestre repartimos apartados en reunión
 
 ### Referencias encontradas
 
-Entre el **1 y el 20 de octubre de 2026** recopilamos fuentes regulatorias (FDA), artículos revisados por pares y documentación de producto. En la tabla figura la **fecha de acceso** (consulta en ese intervalo). Las URLs completas son enlaces clicables en el PDF.
+Entre el **1 y el 20 de octubre de 2026** recopilamos fuentes regulatorias (FDA), artículos revisados por pares y documentación de producto. En cada punto figura la **fecha de acceso** (consulta en ese intervalo). Las URLs completas son enlaces clicables en el PDF.
 
-| Referencia | URL | Uso en el trabajo | Acceso |
-|---|---|---|---|
-| FDA — Paige Prostate (De Novo DEN200080) | https://www.accessdata.fda.gov/cdrh_docs/pdf20/DEN200080.pdf | Indicaciones, limitaciones como IVD adjunto | 01/10/2026 |
-| FDA — Resumen decisión DEN200080 | https://www.accessdata.fda.gov/cdrh_docs/reviews/DEN200080.pdf | Validación clínica, deep learning sobre WSI | 03/10/2026 |
-| FDA — PathAI AISight Dx (510(k) K243391) | https://www.accessdata.fda.gov/cdrh_docs/reviews/K243391.pdf | PathAI, visualización en patología digital | 05/10/2026 |
-| FDA — Paige FullFocus (510(k) K241273) | https://www.accessdata.fda.gov/cdrh_docs/reviews/K241273.pdf | Visor de láminas, interoperabilidad PACS | 07/10/2026 |
-| FDA — Digital pathology (guía para la industria) | https://www.fda.gov/media/133714/download | Marco regulatorio WSI, buenas prácticas | 09/10/2026 |
-| Campanella et al., *Nature Medicine* 25, 1301–1309 (2019) | https://doi.org/10.1038/s41591-019-0438-z | IA en cáncer de mama en cohorte real | 11/10/2026 |
-| Echle et al., *Nature Cancer* 2, 128–138 (2021) | https://doi.org/10.1038/s43018-020-00162-w | Despliegue clínico y generalización | 13/10/2026 |
-| Lu et al., *Nature Biomedical Engineering* (2021) | https://doi.org/10.1038/s41551-021-00789-6 | Deep learning en patología, diseño de estudios | 15/10/2026 |
-| Topol, *Nature Medicine* 25, 44–56 (2019) | https://doi.org/10.1038/s41591-018-0300-7 | Panorama IA en medicina (contexto) | 16/10/2026 |
-| PathAI — productos y publicaciones | https://www.pathai.com/ | Línea comercial PathAI, casos de uso | 17/10/2026 |
-| Paige — Paige Prostate y plataforma | https://www.paige.ai/ | Ecosistema Paige, mensaje clínico | 18/10/2026 |
-| WHO — Ethics and governance of AI for health (2021) | https://iris.who.int/handle/10665/340773 | Ética, equidad, supervisión humana | 19/10/2026 |
-| NHS England — AI in pathology (informe) | https://www.england.nhs.uk/ourwork/innovation/ai-lab/ | Contexto sanitario público, adopción | 20/10/2026 |
+- **FDA — Paige Prostate (De Novo DEN200080).** URL: https://www.accessdata.fda.gov/cdrh_docs/pdf20/DEN200080.pdf. Uso en el trabajo: indicaciones y limitaciones como IVD adjunto. Acceso: 01/10/2026.
+- **FDA — Resumen decisión DEN200080.** URL: https://www.accessdata.fda.gov/cdrh_docs/reviews/DEN200080.pdf. Uso en el trabajo: validación clínica y deep learning sobre WSI. Acceso: 03/10/2026.
+- **FDA — PathAI AISight Dx (510(k) K243391).** URL: https://www.accessdata.fda.gov/cdrh_docs/reviews/K243391.pdf. Uso en el trabajo: PathAI y visualización en patología digital. Acceso: 05/10/2026.
+- **FDA — Paige FullFocus (510(k) K241273).** URL: https://www.accessdata.fda.gov/cdrh_docs/reviews/K241273.pdf. Uso en el trabajo: visor de láminas e interoperabilidad PACS. Acceso: 07/10/2026.
+- **FDA — Digital pathology (guía para la industria).** URL: https://www.fda.gov/media/133714/download. Uso en el trabajo: marco regulatorio WSI y buenas prácticas. Acceso: 09/10/2026.
+- **Campanella et al., *Nature Medicine* 25, 1301–1309 (2019).** URL: https://doi.org/10.1038/s41591-019-0438-z. Uso en el trabajo: IA en cáncer de mama en cohorte real. Acceso: 11/10/2026.
+- **Echle et al., *Nature Cancer* 2, 128–138 (2021).** URL: https://doi.org/10.1038/s43018-020-00162-w. Uso en el trabajo: despliegue clínico y generalización. Acceso: 13/10/2026.
+- **Lu et al., *Nature Biomedical Engineering* (2021).** URL: https://doi.org/10.1038/s41551-021-00789-6. Uso en el trabajo: deep learning en patología y diseño de estudios. Acceso: 15/10/2026.
+- **Topol, *Nature Medicine* 25, 44–56 (2019).** URL: https://doi.org/10.1038/s41591-018-0300-7. Uso en el trabajo: panorama de la IA en medicina (contexto). Acceso: 16/10/2026.
+- **PathAI — productos y publicaciones.** URL: https://www.pathai.com/. Uso en el trabajo: línea comercial de PathAI y casos de uso. Acceso: 17/10/2026.
+- **Paige — Paige Prostate y plataforma.** URL: https://www.paige.ai/. Uso en el trabajo: ecosistema Paige y mensaje clínico. Acceso: 18/10/2026.
+- **WHO — Ethics and governance of AI for health (2021).** URL: https://iris.who.int/handle/10665/340773. Uso en el trabajo: ética, equidad y supervisión humana. Acceso: 19/10/2026.
+- **NHS England — AI in pathology (informe).** URL: https://www.england.nhs.uk/ourwork/innovation/ai-lab/. Uso en el trabajo: contexto sanitario público y adopción. Acceso: 20/10/2026.
 
-Además de la tabla, estamos tomando notas sobre: (i) diferencia entre **algoritmo de detección** (p. ej. Paige Prostate) y **visor/plataforma** (FullFocus, AISight Dx); (ii) requisitos de **validación prospectiva** que exige la FDA en De Novo frente a 510(k); (iii) papers que discuten **sesgo de sitio** (coloración H&E, escáner) porque condiciona si un modelo entrenado en un hospital generaliza en otro.
+Además de estas referencias, estamos tomando notas sobre: (i) diferencia entre **algoritmo de detección** (p. ej. Paige Prostate) y **visor/plataforma** (FullFocus, AISight Dx); (ii) requisitos de **validación prospectiva** que exige la FDA en De Novo frente a 510(k); (iii) papers que discuten **sesgo de sitio** (coloración H&E, escáner) porque condiciona si un modelo entrenado en un hospital generaliza en otro.
 
 ### Dificultades encontradas
 
