@@ -4,12 +4,12 @@ subtitle: "Distribución de energía eléctrica"
 author: "Denys Cherednychenko · Albert Piñol Boncompte · Biel Bernat Cuscó Collelldemont"
 date: 2026-10-20
 lang: es
-title-block: false
+title-block: true
 format:
   pdf:
-    output-file: "Practica-energia-informe.pdf"
     documentclass: scrreprt
-    toc: false
+    toc: true
+    toc-depth: 2
     papersize: a4
     geometry:
       - top=2.4cm
@@ -42,8 +42,6 @@ En el enunciado, una central encendida consume el coste de toda su producción a
 El informe describe la representación, los experimentos del PDF y las conclusiones extraídas de las réplicas. Las figuras resumen las comparaciones entre operadores, inicialización, heurísticas y algoritmos.
 
 ## Organización del equipo
-
-Integrantes: Denys Cherednychenko, Albert Piñol Boncompte y Biel Bernat Cuscó Collelldemont.
 
 Mecanismos de comunicación: canal de Discord del grupo (consultas, enlaces al repositorio y avisos) y reuniones síncronas para decisiones de diseño y reparto de tareas.
 
@@ -878,34 +876,40 @@ En conjunto, para el escenario estudiado: inicialización `VORAZ`, operadores `M
 
 ## Trabajo de innovación
 
-Albert Piñol · Denys Cherednychenko · Bernat Cuscó Collelldemont
-
 ### Tema elegido
 
-PathAI y Paige: diagnóstico de cáncer con visión por computador en anatomía patológica digital. Nos interesa comparar cómo estas empresas usan aprendizaje profundo sobre imágenes de láminas histológicas (whole slide imaging) para apoyar al patólogo, qué papel tiene la regulación (FDA) y qué límites éticos y clínicos implica que un algoritmo marque regiones sospechosas sin sustituir el criterio humano. Creemos que es un ejemplo muy claro de IA aplicada con impacto real en salud.
+PathAI y Paige: diagnóstico de cáncer con visión por computador en anatomía patológica digital. El trabajo del cuatrimestre comparará cómo ambas compañías aplican aprendizaje profundo sobre imágenes de láminas histológicas (whole slide imaging) para apoyar al patólogo: detección de regiones sospechosas, visualización y flujo clínico. Nos interesan la validación regulatoria (FDA), el papel del algoritmo como herramienta adjunta (no sustituto del diagnóstico) y los límites éticos (sesgos, generalización entre hospitales). Es un caso concreto de IA en salud con productos ya desplegados y documentación pública.
 
 ### Reparto del trabajo
 
-Responsables de la búsqueda de información para cada apartado del informe de innovación (documento del cuatrimestre):
-
-| Apartado del trabajo | Responsable de la búsqueda |
-|---|---|
-| Contexto del problema clínico y anatomía patológica digital | Albert |
-| PathAI: productos, enfoque técnico y validación | Denys |
-| Paige (Paige Prostate y ecosistema): regulación FDA y uso clínico | Bernat |
-| Marco ético, sesgos y papel del patólogo | Albert y Bernat |
-| Comparativa PathAI vs Paige y conclusiones del informe | Denys (coordinación) y revisión conjunta |
+Para el informe de innovación del cuatrimestre repartimos apartados en reunión (8/10/2025): contexto clínico y WSI, producto PathAI, producto Paige, marco ético y comparativa final. Cada apartado lo redactará quien lideró la búsqueda; el borrador conjunto se revisa en Discord antes de entregar.
 
 ### Referencias encontradas
 
-| Referencia | Apartados relevantes | Fecha de acceso |
-|---|---|---|
-| FDA, De Novo DEN200080 — Paige Prostate (autorización 2021) | Paige, indicaciones de uso, límites como herramienta adjunta | 25/10/2026 |
-| FDA, resumen de decisión DEN200080 (Paige Prostate) | Validación clínica, deep learning, whole slide images | 25/10/2026 |
-| FDA, 510(k) K243391 — PathAI AISight Dx | PathAI, software de visualización en patología digital | 25/10/2026 |
-| FDA, 510(k) K241273 — Paige FullFocus | Visualización de láminas digitales, interoperabilidad | 25/10/2026 |
-| Campanella et al., *Nature Medicine* (2019) — IA en cáncer de mama en patología | Contexto clínico, rendimiento en cohortes reales | 25/10/2026 |
+Entre el **1 y el 20 de octubre de 2026** recopilamos fuentes regulatorias (FDA), artículos revisados por pares y documentación de producto. En la tabla figura la **fecha de acceso** (consulta en ese intervalo). Las URLs completas son enlaces clicables en el PDF.
+
+| Referencia | URL | Uso en el trabajo | Acceso |
+|---|---|---|---|
+| FDA — Paige Prostate (De Novo DEN200080) | https://www.accessdata.fda.gov/cdrh_docs/pdf20/DEN200080.pdf | Indicaciones, limitaciones como IVD adjunto | 01/10/2026 |
+| FDA — Resumen decisión DEN200080 | https://www.accessdata.fda.gov/cdrh_docs/reviews/DEN200080.pdf | Validación clínica, deep learning sobre WSI | 03/10/2026 |
+| FDA — PathAI AISight Dx (510(k) K243391) | https://www.accessdata.fda.gov/cdrh_docs/reviews/K243391.pdf | PathAI, visualización en patología digital | 05/10/2026 |
+| FDA — Paige FullFocus (510(k) K241273) | https://www.accessdata.fda.gov/cdrh_docs/reviews/K241273.pdf | Visor de láminas, interoperabilidad PACS | 07/10/2026 |
+| FDA — Digital pathology (guía para la industria) | https://www.fda.gov/media/133714/download | Marco regulatorio WSI, buenas prácticas | 09/10/2026 |
+| Campanella et al., *Nature Medicine* 25, 1301–1309 (2019) | https://doi.org/10.1038/s41591-019-0438-z | IA en cáncer de mama en cohorte real | 11/10/2026 |
+| Echle et al., *Nature Cancer* 2, 128–138 (2021) | https://doi.org/10.1038/s43018-020-00162-w | Despliegue clínico y generalización | 13/10/2026 |
+| Lu et al., *Nature Biomedical Engineering* (2021) | https://doi.org/10.1038/s41551-021-00789-6 | Deep learning en patología, diseño de estudios | 15/10/2026 |
+| Topol, *Nature Medicine* 25, 44–56 (2019) | https://doi.org/10.1038/s41591-018-0300-7 | Panorama IA en medicina (contexto) | 16/10/2026 |
+| PathAI — productos y publicaciones | https://www.pathai.com/ | Línea comercial PathAI, casos de uso | 17/10/2026 |
+| Paige — Paige Prostate y plataforma | https://www.paige.ai/ | Ecosistema Paige, mensaje clínico | 18/10/2026 |
+| WHO — Ethics and governance of AI for health (2021) | https://iris.who.int/handle/10665/340773 | Ética, equidad, supervisión humana | 19/10/2026 |
+| NHS England — AI in pathology (informe) | https://www.england.nhs.uk/ourwork/innovation/ai-lab/ | Contexto sanitario público, adopción | 20/10/2026 |
+
+Además de la tabla, estamos tomando notas sobre: (i) diferencia entre **algoritmo de detección** (p. ej. Paige Prostate) y **visor/plataforma** (FullFocus, AISight Dx); (ii) requisitos de **validación prospectiva** que exige la FDA en De Novo frente a 510(k); (iii) papers que discuten **sesgo de sitio** (coloración H&E, escáner) porque condiciona si un modelo entrenado en un hospital generaliza en otro.
 
 ### Dificultades encontradas
 
-La documentación regulatoria (FDA) es precisa pero densa: hay que separar bien qué producto es algoritmo de detección (Paige Prostate) y qué producto es visor o plataforma (FullFocus, AISight Dx). También cuesta encontrar artículos divulgativos que no mezclen marketing con evidencia clínica; por eso hemos priorizado fuentes regulatorias y artículos en revistas médicas. Por último, muchos preprints usan conjuntos de datos privados, lo que complica comparar cifras de sensibilidad o especificidad entre PathAI y Paige de forma homogénea.
+La documentación regulatoria (FDA) es precisa pero densa: hay que distinguir qué producto es un algoritmo de detección y cuáles son visores o plataforma, porque no tienen el mismo rol clínico ni las mismas claims.
+
+También cuesta encontrar divulgación que no mezcle marketing con evidencia: priorizamos resúmenes FDA, DOI en revistas médicas y guías como la de la OMS. Muchos preprints usan conjuntos privados, lo que complica comparar sensibilidad o especificidad entre PathAI y Paige con la misma metodología.
+
+El vocabulario clínico (WSI, H&E, De Novo vs 510(k), IVD) exige varias lecturas; lo resolvemos repartiendo apartados y contrastando en reunión el flujo patólogo–algoritmo–informe. Por último, algunos PDF de la FDA son largos y no están bien indexados: conviene anotar número de decisión (DEN/510k) para citarlos de forma unívoca en el informe final.

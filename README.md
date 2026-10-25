@@ -110,6 +110,11 @@ Per generar el report en PDF:
 quarto render report\report.qmd
 ```
 
+Cierra cualquier pestaña del PDF (`report.pdf` o copias antiguas) antes de **Preview** o
+`quarto render`: en Windows el archivo queda bloqueado y Quarto no puede sobrescribirlo.
+La carpeta `report/` debe quedar solo con `report.qmd`, `report-style.tex` y `report.pdf`
+(el resto de auxiliares Quarto/LaTeX está en `.gitignore`).
+
 En Linux o macOS hay que cambiar los `;` del classpath por `:`.
 
 La bateria completa tarda unos dos minutos. Escribe un resumen por pantalla, el detalle de cada
